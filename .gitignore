@@ -1,0 +1,38 @@
+# dependências do node
+node_modules/
+
+# caches de builds
+build/
+dist/
+coverage/
+.nyc_output/
+.cache/
+.emscripten_cache/
+
+# variáveis de ambiente
+.env
+.env.*
+!.env.example
+
+# dados gerados em execução ou que podem ser gerados
+data/
+logs/
+*.log
+npm-debug.log*
+*.pid
+*.pid.lock
+
+# Arquivos temporários
+tmp/
+.tmp/
+*.swp
+*.swo
+
+# criado pelo vscode
+.vscode/
+.idea/
+
+# arquivos gerados pelo SO
+.DS_Store
+Thumbs.db
+Desktop.ini
