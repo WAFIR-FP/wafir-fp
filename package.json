@@ -1,0 +1,29 @@
+{
+  "name": "wasm-fingerprint-research",
+  "version": "1.0.0",
+  "description": "Research tool for comparing browser fingerprinting in JavaScript and WebAssembly",
+  "license": "MIT",
+  "author": "wasm-fingerprint",
+  "type": "module",
+  "main": "app.js",
+  "engines": {
+    "node": "24.x",
+    "npm": "11.x"
+  },
+  "scripts": {
+    "build": "make",
+    "start": "node app.js",
+    "dev": "npm run build && npm run watch",
+    "docker": "docker compose up --build",
+    "watch": "nodemon --watch app.js --watch src --ext js,html --exec \"npm start\"",
+    "test": "make test"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "pg": "^8.20.0",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

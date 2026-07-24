@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ferramenta de Web Fingerprint</title>
+
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="manifest" href="/assets/site.webmanifest">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #1e3a5f;
+            --primary-dark: #0f1e3a;
+            --accent: #3182ce;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --border: #e2e8f0;
+            --shadow: 0 3px 12px rgba(15, 30, 58, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+            color: var(--text-primary);
+            background: linear-gradient(180deg, #eef3f9 0, #f7fafc 220px, #f7fafc 100%);
+            min-height: 100vh;
+        }
+
+        .page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(110deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: #fff;
+            padding: 22px clamp(18px, 3.5vw, 56px) 18px;
+            border-bottom: 4px solid var(--accent);
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 6px;
+        }
+
+        .header h1 {
+            font-family: 'Merriweather', Georgia, serif;
+            font-size: clamp(1.55rem, 1.5vw, 2.2rem);
+            margin-bottom: 0;
+        }
+
+        .header-link {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 100;
+            font-size: clamp(0.98rem, 1vw, 2.2rem);
+            font-family: 'Merriweather', Georgia, serif;
+            line-height: 1;
+            white-space: nowrap;
+            opacity: 0.94;
+        }
+
+        .header p {
+            font-size: 0.98rem;
+            max-width: 900px;
+            opacity: 0.94;
+        }
+
+        .main {
+            flex: 1;
+            padding: clamp(20px, 3vw, 36px) clamp(18px, 4vw, 72px) 36px;
+            max-width: 1180px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: var(--primary-dark);
+            font-family: 'Merriweather', Georgia, serif;
+            font-size: clamp(1.1rem, 1.55vw, 1.45rem);
+            line-height: 1.5;
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .home-layout {
+            flex: 1;
+            display: grid;
+            grid-template-columns: minmax(360px, 1.1fr) minmax(320px, 0.9fr);
+            gap: 24px;
+            align-items: start;
+            width: 100%;
+        }
+
+        .home-left-column {
+            display: grid;
+            gap: 24px;
+            align-content: start;
+        }
+
+        .section {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 24px 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .section h2 {
+            font-family: 'Merriweather', Georgia, serif;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.28rem;
+        }
+
+        .section p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+
+        .intro-cta {
+            display: flex;
+            justify-content: center;
+            margin-top: 14px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            text-decoration: none;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff;
+            border-radius: 5px;
+            padding: 12px 20px;
+            font-weight: 700;
+            font-size: 0.98rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease;
+            text-align: center;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .image-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding-top: 24px;
+            padding-bottom: 24px;
+        }
+
+        .wasm-image {
+            width: min(100%, 360px);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            background: #fff;
+            padding: 10px;
+        }
+
+        @media (max-width: 940px) {
+            .home-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .header-row {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .intro-cta {
+                justify-content: center;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header class="header">
+            <div class="header-row">
+                <h1>Ferramenta de Web Fingerprint</h1>
+                <a href="/sobre" class="header-link">Sobre</a>
+            </div>
+        </header>
+
+        <main class="main">
+            <h2 class="page-subtitle">Framework Experimental de Web Fingerprinting utilizando WebAssembly</h2>
+            <div class="home-layout">
+                <div class="home-left-column">
+                    <section class="section">
+                        <p>
+                            Teste seu navegador e veja como atributos do seu dispositivo podem ser coletados para gerar um fingerprint.
+                        </p>
+                        <div class="intro-cta">
+                            <a href="/coleta-fingerprint" class="cta-btn">Inicie aqui a coleta de fingerprint</a>
+                        </div>
+                    </section>
+
+                    <section class="section">
+                        <h2>Importante!</h2>
+                        <p>
+                            Ao iniciar o teste, a ferramenta coletará apenas os atributos necessários para compor um fingerprint experimental. 
+                            As informações obtidas serão utilizadas somente para pesquisa acadêmica, com tratamento anonimizado sempre que possível, 
+                            e não serão empregadas para identificar, rastrear ou monitorar usuários fora deste estudo.
+                        </p>
+                    </section>
+                </div>
+
+                <section class="section image-panel">
+                    <img class="wasm-image" src="/assets/images/wasmpicture.png" alt="Ilustração do projeto WebAssembly Fingerprint">
+                </section>
+            </div>
+        </main>
+
+    </div>
+</body>
+</html>

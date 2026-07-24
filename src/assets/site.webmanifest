@@ -1,0 +1,14 @@
+{
+  "name": "WASM Fingerprint",
+  "short_name": "Fingerprint",
+  "icons": [
+    {
+      "src": "/assets/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}

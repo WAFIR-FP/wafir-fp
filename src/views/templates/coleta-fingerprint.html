@@ -1,0 +1,2509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ferramenta de Web Fingerprint</title>
+
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="manifest" href="/assets/site.webmanifest">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary: #1e3a5f;
+            --primary-light: #2c5282;
+            --primary-dark: #0f1e3a;
+            --accent: #3182ce;
+            --accent-light: #4299e1;
+
+            --success: #2f855a;
+            --error: #c53030;
+            --warning: #d69e2e;
+
+            --bg-light: #f7fafc;
+            --bg-card: #ffffff;
+            --bg-secondary: #edf2f7;
+
+            --text-primary: #1a202c;
+            --text-dark: #1a202c;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            --text-light: #a0aec0;
+
+            --border: #e2e8f0;
+            --border-dark: #cbd5e0;
+
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+            color: var(--text-primary);
+            background: linear-gradient(180deg, #eef3f9 0, #f7fafc 300px, #f7fafc 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(110deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: #fff;
+            padding: 22px clamp(18px, 3.5vw, 56px) 18px;
+            border-bottom: 4px solid var(--accent);
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 6px;
+        }
+
+        .header-links {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .header h1 {
+            font-family: 'Merriweather', Georgia, serif;
+            font-size: clamp(1.55rem, 1.5vw, 2.2rem);
+            margin-bottom: 0;
+        }
+
+        .header-link {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 100;
+            font-size: clamp(0.98rem, 1vw, 2.2rem);
+            font-family: 'Merriweather', Georgia, serif;
+            line-height: 1;
+            white-space: nowrap;
+            opacity: 0.94;
+        }
+
+        .header p {
+            font-size: 0.98rem;
+            max-width: 900px;
+            opacity: 0.94;
+            margin-bottom: 0;
+        }
+
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tech-badge {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .main-content {
+            padding: clamp(20px, 3vw, 36px) clamp(18px, 4vw, 72px) 40px;
+            flex: 1;
+        }
+
+        .page-end-actions {
+            margin-top: 26px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .intro-layout {
+            display: grid;
+            grid-template-columns: minmax(420px, 1.35fr) minmax(260px, 1fr);
+            gap: 24px;
+            align-items: stretch;
+            margin-bottom: 24px;
+        }
+
+        .project-intro {
+            background: linear-gradient(180deg, #fbfdff 0%, #f0f5fb 100%);
+            border: 1px solid var(--border);
+            border-left: 6px solid var(--primary-light);
+            border-radius: 6px;
+            padding: 20px 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .project-intro h2 {
+            font-family: 'Merriweather', Georgia, serif;
+            font-size: 1.2em;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .project-intro p {
+            font-size: 0.98em;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .project-intro h3 {
+            margin: 14px 0 6px;
+            font-size: 0.98em;
+            color: var(--primary-dark);
+            font-weight: 700;
+        }
+
+        .project-intro ul {
+            margin: 6px 0 10px 18px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .project-intro li {
+            margin-bottom: 4px;
+        }
+
+        .wasm-picture-wrap {
+            margin: 0;
+        }
+
+        .wasm-picture-wrap img {
+            width: 100%;
+            height: 100%;
+            min-height: 210px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 4px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-light);
+        }
+
+        .status {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 0;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            font-size: 1.06rem;
+            line-height: 1.35;
+            flex: 1;
+            min-width: min(520px, 100%);
+        }
+
+        .status.active {
+            display: flex;
+        }
+
+        .status.loading {
+            background: #fef5e7;
+            color: #7d6608;
+            border-left: 4px solid var(--warning);
+        }
+
+        .status.success {
+            background: #e8f5e9;
+            color: #1e4620;
+            border-left: 4px solid var(--success);
+        }
+
+        .status.error {
+            background: #ffebee;
+            color: #7f1d1d;
+            border-left: 4px solid var(--error);
+        }
+
+        .collection-loader {
+            display: none;
+            background: linear-gradient(180deg, #ffffff 0%, #f4f8fd 100%);
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--accent);
+            border-radius: 10px;
+            box-shadow: var(--shadow-md);
+            padding: 18px 20px;
+            margin-bottom: 20px;
+        }
+
+        .collection-loader.active {
+            display: block;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .collection-loader-head {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .collection-loader-spinner {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 3px solid rgba(30, 58, 95, 0.18);
+            border-top-color: var(--accent);
+            animation: loaderSpin 0.9s linear infinite;
+            flex-shrink: 0;
+        }
+
+        .collection-loader-title {
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin: 0 0 2px 0;
+        }
+
+        .collection-loader-message {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .collection-loader-track {
+            margin-top: 12px;
+            height: 7px;
+            border-radius: 999px;
+            background: #e6edf6;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .collection-loader-track::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -35%;
+            width: 35%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, transparent 0%, var(--accent-light) 55%, transparent 100%);
+            animation: loaderSweep 1.15s ease-in-out infinite;
+        }
+
+        .fingerprint-hash {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .fingerprint-hash.active {
+            display: block;
+        }
+
+        .fingerprint-hash h3 {
+            margin-bottom: 12px;
+            font-size: 1.2em;
+        }
+
+        .hash-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .hash-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            padding: 10px;
+            border: 1px solid rgba(30, 58, 95, 0.15);
+        }
+
+        .hash-value {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            word-break: break-all;
+            line-height: 1.5;
+        }
+
+        .timing-meta {
+            margin-top: 8px;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.85);
+            text-align: center;
+        }
+
+        .fingerprint-json {
+            background: var(--bg-light);
+            padding: 24px;
+            border-radius: 6px;
+            margin: 24px 0;
+            box-shadow: var(--shadow-md);
+            border: 2px solid var(--primary-light);
+            display: none;
+        }
+
+        .fingerprint-json.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .fingerprint-json h3 {
+            color: var(--primary);
+            font-size: 1.2em;
+        }
+
+        .json-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .json-card {
+            background: #ffffff;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            padding: 12px;
+        }
+
+        .json-card header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .json-card h4 {
+            margin: 0;
+            font-size: 1em;
+            color: var(--primary);
+        }
+
+        .json-display {
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: var(--text-dark);
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            white-space: pre;
+        }
+
+        .json-display::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .json-display::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .json-display::-webkit-scrollbar-thumb {
+            background: var(--primary-light);
+            border-radius: 4px;
+        }
+
+        .json-display::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 25px;
+            gap: 5px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 14px 24px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-muted);
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .overview-fingerprint-card {
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .overview-fingerprint-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(30, 58, 95, 0.18) !important;
+        }
+
+        .overview-fingerprint-card:focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-container {
+            display: none;
+        }
+
+        .results-container.active {
+            display: block;
+        }
+
+        .fingerprint-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            z-index: 1200;
+        }
+
+        .fingerprint-modal.active {
+            display: block;
+        }
+
+        .fingerprint-modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 30, 58, 0.72);
+            backdrop-filter: blur(2px);
+        }
+
+        .fingerprint-modal-dialog {
+            position: relative;
+            z-index: 1;
+            width: min(1080px, calc(100vw - 40px));
+            max-height: calc(100vh - 40px);
+            margin: 20px auto;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--border);
+            overflow: auto;
+            padding: 18px;
+        }
+
+        .fingerprint-modal-close {
+            position: sticky;
+            top: 0;
+            margin-left: auto;
+            display: block;
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            font-size: 20px;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+        }
+
+        #fingerprintModalContent .data-section {
+            margin-bottom: 0;
+        }
+
+        .data-section {
+            background: var(--bg-light);
+            border-radius: 6px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .data-section h3 {
+            color: var(--text-dark);
+            margin-bottom: 16px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 12px;
+        }
+
+        .data-item {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 4px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .data-label {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.9em;
+            margin-bottom: 4px;
+        }
+
+        .data-value {
+            font-family: 'Courier New', monospace;
+            color: var(--text-dark);
+            font-size: 0.95em;
+            word-break: break-word;
+        }
+
+        .hash-preview {
+            background: #e3f2fd;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #1976d2;
+        }
+
+        .results-title {
+            color: var(--primary);
+            margin: 0 0 18px 0;
+            font-size: 1.35em;
+            font-family: 'Merriweather', Georgia, serif;
+        }
+
+        .overview-intro {
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .overview-top-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .overview-panel {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--primary-light);
+            border-radius: 4px;
+            padding: 14px 16px;
+        }
+
+        .overview-panel h4 {
+            margin: 0 0 8px 0;
+            color: var(--primary);
+            font-size: 1.03em;
+        }
+
+        .overview-code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+            word-break: break-all;
+            color: var(--text-primary);
+            background: #f5f8fd;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        .overview-note {
+            margin-top: 10px;
+            font-size: 0.86em;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .overview-subtitle {
+            margin: 20px 0 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border-dark);
+            color: var(--primary);
+            font-family: 'Merriweather', Georgia, serif;
+            font-size: 1.04em;
+        }
+
+        .overview-helper {
+            margin: 0 0 12px 0;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .overview-components-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .overview-component-card {
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 14px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+            color: #fff;
+        }
+
+        .overview-component-card:hover {
+            transform: translateY(-2px);
+            filter: saturate(1.08);
+            box-shadow: 0 10px 18px rgba(15, 30, 58, 0.26) !important;
+        }
+
+        .overview-component-card:focus-visible {
+            outline: 3px solid rgba(255, 255, 255, 0.9);
+            outline-offset: 2px;
+        }
+
+        .component-canvas {
+            background: linear-gradient(135deg, #336da8 0%, #2d5f93 100%);
+            box-shadow: 0 6px 12px rgba(51, 109, 168, 0.28);
+        }
+
+        .component-webgl {
+            background: linear-gradient(135deg, #274b77 0%, #1f3e63 100%);
+            box-shadow: 0 6px 12px rgba(39, 75, 119, 0.28);
+        }
+
+        .component-audio {
+            background: linear-gradient(135deg, #2d8f9f 0%, #257c8a 100%);
+            box-shadow: 0 6px 12px rgba(45, 143, 159, 0.28);
+        }
+
+        .component-browser {
+            background: linear-gradient(135deg, #2f855a 0%, #246a47 100%);
+            box-shadow: 0 6px 12px rgba(47, 133, 90, 0.28);
+        }
+
+        .component-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .component-title {
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .component-weight {
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+
+        .component-desc {
+            color: rgba(255, 255, 255, 0.94);
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .component-fragment {
+            font-family: 'Courier New', monospace;
+            font-size: 0.82em;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 4px;
+            padding: 8px;
+            word-break: break-all;
+        }
+
+        .weight-distribution {
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+            display: flex;
+            height: 46px;
+        }
+
+        .weight-segment {
+            color: white;
+            font-size: 0.84em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 6px;
+        }
+
+        .segment-canvas {
+            flex: 25;
+            background: #336da8;
+        }
+
+        .segment-webgl {
+            flex: 20;
+            background: #274b77;
+        }
+
+        .segment-audio {
+            flex: 10;
+            background: #2d8f9f;
+        }
+
+        .segment-browser {
+            flex: 45;
+            background: #2f855a;
+        }
+
+        .overview-paragraph {
+            color: var(--text-secondary);
+            line-height: 1.65;
+            margin-bottom: 12px;
+        }
+
+        .threshold-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .threshold-row {
+            display: grid;
+            grid-template-columns: 85px 1fr;
+            gap: 10px;
+            align-items: center;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            border-radius: 4px;
+            padding: 10px 12px;
+        }
+
+        .threshold-score {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.05em;
+        }
+
+        .threshold-label {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .threshold-detail {
+            color: var(--text-secondary);
+            font-size: 0.88em;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.65rem;
+            }
+
+            .header-row {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .header-links {
+                width: 100%;
+                justify-content: flex-start;
+                gap: 10px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .intro-layout {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .wasm-picture-wrap img {
+                min-height: 180px;
+            }
+
+            .results-title {
+                font-size: 1.2em;
+            }
+
+            .weight-distribution {
+                height: auto;
+                flex-direction: column;
+            }
+
+            .weight-segment {
+                min-height: 34px;
+            }
+
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .fingerprint-modal-dialog {
+                width: calc(100vw - 16px);
+                max-height: calc(100vh - 16px);
+                margin: 8px auto;
+                padding: 12px;
+            }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes loaderSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes loaderSweep {
+            0% { left: -35%; }
+            100% { left: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-row">
+                <h1>Ferramenta de Web Fingerprint</h1>
+                <div class="header-links">
+                    <a href="/" class="header-link">Início</a>
+                    <a href="/sobre" class="header-link">Sobre</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="actions">
+                <button class="btn btn-secondary" onclick="recollectFingerprint()" id="clearBtn" disabled>
+                    Coletar novamente
+                </button>
+                <div id="status" class="status"></div>
+            </div>
+
+            <section id="collectionLoader" class="collection-loader active" aria-live="polite" aria-busy="true">
+                <div class="collection-loader-head">
+                    <div class="collection-loader-spinner" aria-hidden="true"></div>
+                    <div>
+                        <p class="collection-loader-title">Coleta em andamento</p>
+                        <p id="collectionLoaderMessage" class="collection-loader-message">Inicializando ambiente de coleta...</p>
+                    </div>
+                </div>
+                <div class="collection-loader-track"></div>
+            </section>
+
+            <div id="fingerprintHash" class="fingerprint-hash">
+                <h3>Hash único do Fingerprint</h3>
+                <div class="hash-grid">
+                    <div class="hash-card">
+                        <div style="font-weight: 600; margin-bottom: 6px; text-align: center;">C++ & WebAssembly</div>
+                        <div class="hash-value" id="hashValueCpp">Aguardando coleta</div>
+                    </div>
+                    <div class="hash-card">
+                        <div style="font-weight: 600; margin-bottom: 6px; text-align: center;">JavaScript</div>
+                        <div class="hash-value" id="hashValueJs">Aguardando coleta</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="fingerprintJson" class="fingerprint-json">
+                <h3 style="margin: 0 0 12px;">Fingerprint JSON para Comparação</h3>
+                <div class="json-grid">
+                    <div class="json-card">
+                        <header>
+                            <h4>C++ & WebAssembly</h4>
+                            <button class="btn btn-secondary" data-target="jsonValueCpp" onclick="copyFingerprintJson(this)" style="padding: 6px 12px; font-size: 0.85em;">
+                                Copiar
+                            </button>
+                        </header>
+                        <pre id="jsonValueCpp" class="json-display">Aguardando coleta</pre>
+                    </div>
+                    <div class="json-card">
+                        <header>
+                            <h4>JavaScript</h4>
+                            <button class="btn btn-secondary" data-target="jsonValueJs" onclick="copyFingerprintJson(this)" style="padding: 6px 12px; font-size: 0.85em;">
+                                Copiar
+                            </button>
+                        </header>
+                        <pre id="jsonValueJs" class="json-display">Aguardando coleta</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div id="results" class="results-container">
+                <h3 class="results-title">Visão Geral</h3>
+
+            <div id="tab-overview" class="tab-content active"></div>
+            <div id="tab-canvas" class="tab-content"></div>
+            <div id="tab-webgl" class="tab-content"></div>
+            <div id="tab-audio" class="tab-content"></div>
+            <div id="tab-browser" class="tab-content"></div>
+            </div>
+
+            <div class="page-end-actions">
+                <button class="btn btn-secondary" type="button" onclick="scrollToTopPage()">
+                    Voltar ao topo
+                </button>
+            </div>
+        </div>
+
+        <div id="fingerprintModal" class="fingerprint-modal" aria-hidden="true">
+            <div class="fingerprint-modal-backdrop" onclick="closeFingerprintModal()"></div>
+            <div class="fingerprint-modal-dialog" role="dialog" aria-modal="true" aria-label="Detalhes do fingerprint">
+                <button class="fingerprint-modal-close" type="button" onclick="closeFingerprintModal()" aria-label="Fechar modal">
+                    X
+                </button>
+                <div id="fingerprintModalContent"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { collectFingerprints as collectJsFingerprints } from '/fingerprint/js/lib.js';
+
+        let fingerprintData = null;
+        let currentSessionId = null;
+        let jsFingerprintData = null;
+        let lastTiming = null;
+        let performanceChart = null;
+        let cppInitPromise = null;
+        let cppCollectionPromise = null;
+        let isCollectingFingerprint = false;
+
+        // Aceita apenas a linha JSON final emitida pelo programa C++.
+        function tryParseCppFingerprint(rawLine) {
+            const line = String(rawLine || '').trim();
+            if (!line || line[0] !== '{' || !line.includes('"fingerprint_hash"')) return null;
+
+            try {
+                const parsed = JSON.parse(line);
+                if (parsed && parsed.fingerprint_hash) {
+                    return parsed;
+                }
+            } catch (_) {
+                return null;
+            }
+            return null;
+        }
+
+        // Carrega uma única instância do runtime C++/WebAssembly.
+        async function initCppWasm() {
+            if (cppInitPromise) {
+                return cppInitPromise;
+            }
+
+            cppInitPromise = new Promise((resolve, reject) => {
+                const existingScript = document.getElementById('cpp-wasm-script');
+                if (existingScript && window.Module && typeof window.Module.callMain === 'function') {
+                    resolve(window.Module);
+                    return;
+                }
+
+                window.__fpCppPrintHandler = null;
+                window.Module = {
+                    noInitialRun: true,
+                    print(text) {
+                        if (typeof window.__fpCppPrintHandler === 'function') {
+                            window.__fpCppPrintHandler(String(text || ''));
+                        }
+                    },
+                    printErr(text) {
+                        console.error('[C++/WASM]', text);
+                    },
+                    onRuntimeInitialized() {
+                        console.log(' C++ WebAssembly module loaded successfully');
+                        resolve(window.Module);
+                    }
+                };
+
+                const script = document.createElement('script');
+                script.id = 'cpp-wasm-script';
+                script.src = '/build/lib_fp.js';
+                script.async = true;
+                script.onerror = (error) => {
+                    console.error(' Failed to load C++ WebAssembly module:', error);
+                    showStatus('Falha ao carregar módulo C++ WebAssembly', 'error');
+                    cppInitPromise = null;
+                    reject(error);
+                };
+
+                document.head.appendChild(script);
+            });
+
+            return cppInitPromise;
+        }
+
+        async function collectCppFingerprint() {
+            await initCppWasm();
+
+            if (cppCollectionPromise) {
+                return cppCollectionPromise;
+            }
+
+            cppCollectionPromise = new Promise((resolve, reject) => {
+                const timeoutId = setTimeout(() => {
+                    window.__fpCppPrintHandler = null;
+                    reject(new Error('Tempo limite ao coletar fingerprint C++ WebAssembly'));
+                }, 45000);
+
+                window.__fpCppPrintHandler = (line) => {
+                    const parsed = tryParseCppFingerprint(line);
+                    if (!parsed) return;
+
+                    clearTimeout(timeoutId);
+                    window.__fpCppPrintHandler = null;
+                    resolve(parsed);
+                };
+
+                try {
+                    window.Module.callMain([]);
+                } catch (error) {
+                    clearTimeout(timeoutId);
+                    window.__fpCppPrintHandler = null;
+                    reject(error);
+                }
+            }).finally(() => {
+                cppCollectionPromise = null;
+            });
+
+            return cppCollectionPromise;
+        }
+
+        // Executa as coletas em sequência para não distorcer os tempos.
+        window.collectFingerprint = async function() {
+            const hashDiv = document.getElementById('fingerprintHash');
+            const hashValueCpp = document.getElementById('hashValueCpp');
+            const hashValueJs = document.getElementById('hashValueJs');
+            const resultsDiv = document.getElementById('results');
+            const clearBtn = document.getElementById('clearBtn');
+
+            try {
+                isCollectingFingerprint = true;
+                if (clearBtn) clearBtn.disabled = true;
+                setCollectionLoading(true, 'Inicializando módulo C++ WebAssembly...');
+
+                await initCppWasm();
+                showStatus('Coletando dados de fingerprint...', 'loading');
+                setCollectionLoading(true, 'Módulo carregado. Coletando sinais C++ e WebAssembly...');
+
+                let lastJsResult = null;
+                console.log(' Execução única - iniciando coleta sequencial...');
+
+                const cppStart = performance.now();
+                console.log(' C++ & WebAssembly fingerprint: iniciando coleta...');
+                fingerprintData = await collectCppFingerprint();
+                const cppDuration = performance.now() - cppStart;
+
+                const jsStart = performance.now();
+                console.log(' JS fingerprint: iniciando coleta...');
+                setCollectionLoading(true, 'Coletando sinais do fingerprint JavaScript...');
+                const jsResult = await collectJsFingerprints()
+                    .then(data => ({ data, durationMs: performance.now() - jsStart }))
+                    .catch(err => {
+                        console.error('ERROR collecting JS fingerprint:', err);
+                        return null;
+                    });
+
+                if (jsResult?.data?.fingerprint_hash) {
+                    lastJsResult = jsResult;
+                }
+
+                const cppAvg = cppDuration;
+                const jsAvg = jsResult?.durationMs ?? null;
+                const cppSeries = [cppDuration];
+                const jsSeries = [jsResult?.durationMs ?? null];
+
+                console.log(' C++ WebAssembly fingerprint coletado');
+                console.log(' Hash C++ & WebAssembly:', fingerprintData.fingerprint_hash);
+                console.log(` Tempo C++ & WebAssembly (execução única): ${cppAvg.toFixed(2)} ms`);
+                if (jsAvg !== null) {
+                    console.log(` Tempo JS (execução única): ${jsAvg.toFixed(2)} ms`);
+                }
+
+                lastTiming = {
+                    cppAvg,
+                    jsAvg,
+                    cppRuns: 1,
+                    jsRuns: jsAvg !== null ? 1 : 0,
+                    totalRuns: 1,
+                    cppSeries,
+                    jsSeries
+                };
+
+                currentSessionId = generateSessionId(fingerprintData.fingerprint_hash);
+
+                console.log(' Fingerprint collected:', fingerprintData);
+                jsFingerprintData = lastJsResult?.data || null;
+                if (jsFingerprintData?.fingerprint_hash) {
+                    console.log(' JS fingerprint coletado');
+                    console.log(' Hash JS:', jsFingerprintData.fingerprint_hash);
+                }
+
+                hashValueCpp.textContent = fingerprintData.fingerprint_hash;
+                if (lastJsResult?.data?.fingerprint_hash) {
+                    hashValueJs.textContent = lastJsResult.data.fingerprint_hash;
+                } else {
+                    hashValueJs.textContent = 'Falha ao coletar hash JS';
+                }
+                hashDiv.classList.add('active');
+
+                displayFingerprintJson(fingerprintData, jsFingerprintData);
+
+                displayResults(fingerprintData, lastTiming);
+                resultsDiv.classList.add('active');
+                setCollectionLoading(false);
+
+                await sendToServer(fingerprintData, jsFingerprintData);
+
+                showStatus('Fingerprint coletado e salvo com sucesso.', 'success');
+                document.getElementById('clearBtn').disabled = false;
+
+            } catch (error) {
+                console.error(' Erro ao coletar fingerprint:', error);
+                showStatus('Erro: ' + error.message, 'error');
+                setCollectionLoading(false);
+            } finally {
+                isCollectingFingerprint = false;
+                if (clearBtn) clearBtn.disabled = false;
+            }
+        };
+
+        async function sendToServer(cppData, jsData) {
+            const response = await fetch('/api/fingerprint', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...cppData,
+                    sessionId: currentSessionId,
+                    js_fingerprint: jsData
+                })
+            });
+
+            let result = null;
+            try {
+                result = await response.json();
+            } catch (_) {
+                // A mensagem baseada no status abaixo cobre respostas sem JSON.
+            }
+
+            if (!response.ok || result?.success !== true) {
+                const serverMessage = result?.error || `servidor respondeu com status ${response.status}`;
+                throw new Error(`Falha ao salvar o fingerprint: ${serverMessage}`);
+            }
+
+            console.log(' Server response:', result);
+            return result;
+        }
+
+        // Deriva um ID estável sem gravar dados no navegador.
+        function generateSessionId(fingerprintHash) {
+            const hashPrefix = fingerprintHash.substring(0, 32);
+            return `${hashPrefix.substring(0, 8)}-${hashPrefix.substring(8, 12)}-${hashPrefix.substring(12, 16)}-${hashPrefix.substring(16, 20)}-${hashPrefix.substring(20, 32)}`;
+        }
+
+        function displayFingerprintJson(cppData, jsData) {
+            const jsonDiv = document.getElementById('fingerprintJson');
+            const jsonValueCpp = document.getElementById('jsonValueCpp');
+            const jsonValueJs = document.getElementById('jsonValueJs');
+
+            jsonValueCpp.textContent = cppData ? JSON.stringify(cppData, null, 2) : 'Sem dados (coleta C++ & WebAssembly falhou)';
+            jsonValueJs.textContent = jsData ? JSON.stringify(jsData, null, 2) : 'Sem dados (coleta JavaScript falhou)';
+
+            jsonDiv.classList.add('active');
+        }
+
+        window.copyFingerprintJson = async function(buttonEl) {
+            const targetId = buttonEl.getAttribute('data-target');
+            const pre = document.getElementById(targetId);
+
+            if (!pre) return;
+
+            try {
+                await navigator.clipboard.writeText(pre.textContent);
+
+                const originalText = buttonEl.innerHTML;
+                buttonEl.textContent = 'Copiado';
+                buttonEl.style.background = 'var(--success)';
+
+                setTimeout(() => {
+                    buttonEl.innerHTML = originalText;
+                    buttonEl.style.background = '';
+                }, 2000);
+            } catch (error) {
+                console.error('Failed to copy:', error);
+                alert('Erro ao copiar JSON. Por favor, copie manualmente.');
+            }
+        };
+
+        function displayResults(data, timing) {
+            displayOverview(data);
+            displayCanvas(data.canvas_fingerprint);
+            displayWebGL(data.webgl_fingerprint);
+            displayAudio(data.audio_fingerprint, jsFingerprintData?.audio_fingerprint);
+            displayBrowser(data.browser_fingerprint);
+            displayPerformance(timing);
+        }
+
+        function displayOverview(data) {
+            const canvasHash = data?.canvas_fingerprint?.hash || 'N/A';
+            const webglHash = data?.webgl_fingerprint?.hash || 'N/A';
+            const audioHash = data?.audio_fingerprint?.hash || 'N/A';
+            const browser = data?.browser_fingerprint || {};
+            const content = `
+                <div class="data-section">
+                    <h3>Resumo do Fingerprint</h3>
+
+                    <p class="overview-intro">
+                        A comparação entre fingerprints combina Canvas, WebGL, Áudio e Browser com pesos definidos para equilibrar estabilidade e capacidade de diferenciação.
+                        A assinatura final, por sua vez, concatena os hashes dos quatro componentes e aplica o hash criptográfico SHA-256.
+                    </p>
+
+                    <div class="overview-top-grid">
+                        <section class="overview-panel">
+                            <h4>Hash composto (C++ & WebAssembly)</h4>
+                            <div class="overview-code">${data.fingerprint_hash}</div>
+                        </section>
+                        <section class="overview-panel">
+                            <h4>Identificador de sessão</h4>
+                            <div class="overview-code">${currentSessionId || 'N/A'}</div>
+                            <p class="overview-note">
+                                O identificador de sessão é derivado do hash do fingerprint e é determinístico.
+                                Não é utilizado cookies ou armazenamento local no navegador.
+                            </p>
+                        </section>
+                    </div>
+
+                    <h4 class="overview-subtitle">Componentes e Pesos</h4>
+                    <p class="overview-helper">Selecione um componente para abrir os detalhes completos.</p>
+
+                    <div class="overview-components-grid">
+                        <div class="overview-fingerprint-card overview-component-card component-canvas"
+                             role="button"
+                             tabindex="0"
+                             onclick="openFingerprintModal('canvas')"
+                             onkeydown="handleOverviewCardKeydown(event, 'canvas')">
+                            <div class="component-head">
+                                <div class="component-title">Canvas Fingerprint</div>
+                                <div class="component-weight">25%</div>
+                            </div>
+                            <div class="component-desc">Variações de renderização 2D associadas ao ambiente gráfico.</div>
+                            <div class="component-fragment">${canvasHash.substring(0, 32)}...</div>
+                        </div>
+
+                        <div class="overview-fingerprint-card overview-component-card component-webgl"
+                             role="button"
+                             tabindex="0"
+                             onclick="openFingerprintModal('webgl')"
+                             onkeydown="handleOverviewCardKeydown(event, 'webgl')">
+                            <div class="component-head">
+                                <div class="component-title">WebGL Fingerprint</div>
+                                <div class="component-weight">20%</div>
+                            </div>
+                            <div class="component-desc">Características de GPU e driver obtidas por renderização WebGL.</div>
+                            <div class="component-fragment">${webglHash.substring(0, 32)}...</div>
+                        </div>
+
+                        <div class="overview-fingerprint-card overview-component-card component-audio"
+                             role="button"
+                             tabindex="0"
+                             onclick="openFingerprintModal('audio')"
+                             onkeydown="handleOverviewCardKeydown(event, 'audio')">
+                            <div class="component-head">
+                                <div class="component-title">Audio Fingerprint</div>
+                                <div class="component-weight">10%</div>
+                            </div>
+                            <div class="component-desc">Traços de processamento de audio capturados no navegador.</div>
+                            <div class="component-fragment">${audioHash.substring(0, 32)}...</div>
+                        </div>
+
+                        <div class="overview-fingerprint-card overview-component-card component-browser"
+                             role="button"
+                             tabindex="0"
+                             onclick="openFingerprintModal('browser')"
+                             onkeydown="handleOverviewCardKeydown(event, 'browser')">
+                            <div class="component-head">
+                                <div class="component-title">Browser Fingerprint</div>
+                                <div class="component-weight">45%</div>
+                            </div>
+                            <div class="component-desc">Conjunto de atributos gerais de ambiente e execução no navegador.</div>
+                            <div class="component-fragment">
+                                ${browser.platform || 'N/A'} | ${browser.screen_resolution || 'N/A'} | ${browser.timezone || 'N/A'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 class="overview-subtitle">Distribuição de Peso</h4>
+                    <div class="weight-distribution">
+                        <div class="weight-segment segment-canvas">Canvas 25%</div>
+                        <div class="weight-segment segment-webgl">WebGL 20%</div>
+                        <div class="weight-segment segment-audio">Audio 10%</div>
+                        <div class="weight-segment segment-browser">Browser 45%</div>
+                    </div>
+                    <p class="overview-paragraph">
+                        O peso do Browser permanece como base de correlação de contexto. Canvas e WebGL concentram sinais gráficos de boa discriminação.
+                        O Áudio é usado como fator complementar para fortalecer a robustez global sem elevar ruído excessivo.
+                    </p>
+
+                    <h4 class="overview-subtitle">Limites de Identificação</h4>
+                    <div class="threshold-list">
+                        <div class="threshold-row">
+                            <div class="threshold-score">95%+</div>
+                            <div>
+                                <div class="threshold-label">Correspondência Exata</div>
+                                <div class="threshold-detail">Mesmo navegador e mesmo dispositivo.</div>
+                            </div>
+                        </div>
+                        <div class="threshold-row">
+                            <div class="threshold-score">85-95%</div>
+                            <div>
+                                <div class="threshold-label">Mesmo Dispositivo</div>
+                                <div class="threshold-detail">Navegadores diferentes no mesmo equipamento.</div>
+                            </div>
+                        </div>
+                        <div class="threshold-row">
+                            <div class="threshold-score">75-85%</div>
+                            <div>
+                                <div class="threshold-label">Provável Mesmo Dispositivo</div>
+                                <div class="threshold-detail">Semelhança relevante, com potencial variação de ambiente.</div>
+                            </div>
+                        </div>
+                        <div class="threshold-row">
+                            <div class="threshold-score">65-75%</div>
+                            <div>
+                                <div class="threshold-label">Possível Mesmo Usuário</div>
+                                <div class="threshold-detail">Há sinais em comum, mas sem evidência suficiente para confirmar o dispositivo.</div>
+                            </div>
+                        </div>
+                        <div class="threshold-row">
+                            <div class="threshold-score">&lt;65%</div>
+                            <div>
+                                <div class="threshold-label">Diferente</div>
+                                <div class="threshold-detail">Baixa semelhança entre ambientes avaliados.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="overview-note">
+                        A classificação exige pelo menos 50% de cobertura dos componentes comparáveis.
+                    </p>
+                </div>
+            `;
+            document.getElementById('tab-overview').innerHTML = content;
+        }
+
+        function displayCanvas(canvas) {
+            const content = `
+                <div class="data-section">
+                    <h3>Canvas Fingerprint</h3>
+
+                    <div style="background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+                                color: white;
+                                padding: 20px;
+                                border-radius: 12px;
+                                margin-bottom: 30px;
+                                box-shadow: 0 4px 15px rgba(49, 130, 206, 0.2);">
+                        <h4 style="margin: 0 0 15px 0; font-size: 18px;">
+                            <span style="font-size: 24px;"></span> Como o Canvas Fingerprinting funciona?
+                        </h4>
+                        <p style="margin: 0 0 10px 0; line-height: 1.6; opacity: 0.95;">
+                            O Canvas Fingerprinting explora diferenças sutis na forma como os navegadores renderizam gráficos com base na GPU,
+                            nos drivers gráficos, no sistema operacional e nos algoritmos de renderização de subpixels. O processo:
+                        </p>
+                        <ol style="margin: 10px 0 0 20px; line-height: 1.8; opacity: 0.95;">
+                            <li><strong>Desenha uma cena complexa</strong> com texto (incluindo emojis), formas, gradientes e curvas de Bézier.</li>
+                            <li><strong>Utiliza fontes específicas e unicode</strong> (Cwm fjordbank glyphs vext quiz, ) para acionar variações de renderização.</li>
+                            <li><strong>Aplica transparência e modos de mesclagem</strong> que expõem as diferenças entre GPUs/Drivers</li>
+                            <li><strong>Captura a imagem renderizada</strong> como um PNG codificado em base64 (URL de dados)</li>
+                        </ol>
+                        <p style="margin: 15px 0 0 0; line-height: 1.6; opacity: 0.95; font-style: italic;">
+                            <strong>Por que é único:</strong> Mesmo textos/formas idênticos são renderizados com diferenças microscópicas de pixels
+                            em diferentes combinações de hardware/software. O mesmo dispositivo = os mesmos pixels = o mesmo fingerprint!
+                        </p>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <div style="font-weight: 600; color: #495057; margin-bottom: 8px;">Hash do Canvas Fingerprint (SHA-256)</div>
+                        <div style="font-family: 'Courier New', monospace; font-size: 12px; word-break: break-all; color: #212529;">
+                            ${canvas.hash}
+                        </div>
+                        <div style="font-size: 12px; color: #6c757d; margin-top: 8px;">
+                            Este hash é gerado a partir dos dados completos de pixels da imagem renderizada abaixo
+                        </div>
+                    </div>
+
+                    <h4 style="color: #495057; margin: 25px 0 15px 0; font-size: 16px; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
+                         Imagem renderizada do Canvas
+                    </h4>
+                    <div style="background: #ffffff;
+                                padding: 20px;
+                                border-radius: 8px;
+                                text-align: center;
+                                border: 2px solid #dee2e6;
+                                margin-bottom: 20px;">
+                        <img src="${canvas.data_url}"
+                             style="max-width: 100%;
+                                    border-radius: 8px;
+                                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                                    border: 1px solid #e9ecef;"
+                             alt="Canvas Fingerprint">
+                        <div style="margin-top: 15px; font-size: 13px; color: #6c757d; line-height: 1.6;">
+                            <strong>Esta é a sua renderização exclusiva do canvas.</strong><br>
+                            As variações sutis dos pixels são invisíveis ao olho humano, mas criam uma assinatura única.
+                        </div>
+                    </div>
+
+                    <h4 style="color: #495057; margin: 25px 0 15px 0; font-size: 16px; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
+                        O que foi Renderizado
+                    </h4>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <div>
+                                <div style="font-weight: 600; color: #f5576c; margin-bottom: 5px;"> Elementos de Texto</div>
+                                <div style="font-size: 13px; color: #495057; line-height: 1.6;">
+                                     Pangrama Unicode com emoji<br>
+                                     Vrios estilos de fonte (Arial, Courier New)<br>
+                                     Diferentes tamanhos de fonte (10-20 pt)<br>
+                                     Teste de fallback de fonte inexistente
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: #f5576c; margin-bottom: 5px;"> Efeitos Visuais</div>
+                                <div style="font-size: 13px; color: #495057; line-height: 1.6;">
+                                     Retângulo laranja (#f60)<br>
+                                     Gradiente azul com transparência<br>
+                                     Curvas Bézier (RGB(120,186,176))<br>
+                                     Arco circular com mesclagem multiplicada
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: #f5576c; margin-bottom: 5px;"> Especificações Técnicas</div>
+                                <div style="font-size: 13px; color: #495057; line-height: 1.6;">
+                                     Tamanho da Canvas: 28060 pixels<br>
+                                     Linha de base: alfabética<br>
+                                     Operações de composição<br>
+                                     Renderização de texto subpixel
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 6px; border-left: 4px solid #f5576c;">
+                            <div style="font-weight: 600; color: #495057; margin-bottom: 8px;"> Por que esses Elementos?</div>
+                            <div style="font-size: 13px; color: #6c757d; line-height: 1.6;">
+                                Cada elemento é especificamente escolhido para maximizar a precisão do fingerprint:
+                                <ul style="margin: 8px 0 0 20px;">
+                                    <li><strong>Texto com emojis</strong> - Diferentes mecanismos de renderização de fontes lidam com unicode de maneiras diferentes</li>
+                                    <li><strong>Gradientes e transparência</strong> - Expõe variações de anti-aliasing e mistura da GPU</li>
+                                    <li><strong>Curvas Bézier</strong> - Revela diferenças nos algoritmos de renderização de curvas</li>
+                                    <li><strong>Várias fontes</strong> - Testa a disponibilidade de fontes e mecanismos de fallback</li>
+                                    <li><strong>Modos de mesclagem</strong> - Implementações diferentes em navegadores/GPUs</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 style="color: #495057; margin: 25px 0 15px 0; font-size: 16px; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
+                        Dados de Imagem Cru
+                    </h4>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <div style="font-size: 12px; color: #6c757d; margin-bottom: 8px;">
+                            PNG codificado em Base64 (primeiros 150 caracteres):
+                        </div>
+                        <div style="font-family: 'Courier New', monospace;
+                                    font-size: 11px;
+                                    word-break: break-all;
+                                    color: #212529;
+                                    background: white;
+                                    padding: 10px;
+                                    border-radius: 4px;
+                                    max-height: 100px;
+                                    overflow: hidden;">
+                            ${canvas.data_url.substring(0, 150)}...
+                        </div>
+                        <div style="font-size: 12px; color: #6c757d; margin-top: 8px;">
+                            <strong>Tamanho total:</strong> ${canvas.data_url.length.toLocaleString()} caracteres
+                            (~${(canvas.data_url.length * 0.75 / 1024).toFixed(1)} KB)
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('tab-canvas').innerHTML = content;
+        }
+
+        function displayWebGL(webgl) {
+            const extensionsPreview = webgl.extensions && webgl.extensions.length > 0
+                ? webgl.extensions.slice(0, 5).join(', ') + (webgl.extensions.length > 5 ? `... (+${webgl.extensions.length - 5} mais)` : '')
+                : 'None detected';
+
+            const content = `
+                <div class="data-section">
+                    <h3>WebGL Fingerprint</h3>
+
+                    <div style="background: linear-gradient(135deg, #2c5282 0%, #1e3a5f 100%);
+                                color: white;
+                                padding: 20px;
+                                border-radius: 12px;
+                                margin-bottom: 30px;
+                                box-shadow: 0 4px 15px rgba(30, 58, 95, 0.2);">
+                        <h4 style="margin: 0 0 15px 0; font-size: 18px;">
+                            <span style="font-size: 24px;"></span> Como o WebGL Fingerprinting funciona?
+                        </h4>
+                        <p style="margin: 0 0 10px 0; line-height: 1.6; opacity: 0.95;">
+                            O WebGL Fingerprinting identifica o seu hardware gráfico coletando informações sobre sua GPU,
+                            drivers gráficos e recursos suportados. O sistema:
+                        </p>
+                        <ol style="margin: 10px 0 0 20px; line-height: 1.8; opacity: 0.95;">
+                            <li><strong>Renderiza uma cena de teste</strong> com shaders, gradientes e cálculos complexos</li>
+                            <li><strong>Extrai informações da GPU</strong> (fornecedor, modelo do renderizador, recursos)</li>
+                            <li><strong>Analisa a precisão do shader</strong> (precisão do cálculo de ponto flutuante)</li>
+                            <li><strong>Lista extensões compatíveis</strong> (recursos extras compatíveis com sua GPU)</li>
+                            <li><strong>Amostra pixels renderizados</strong> para detectar variações de renderização específicas da GPU/driver</li>
+                        </ol>
+                        <p style="margin: 15px 0 0 0; line-height: 1.6; opacity: 0.95; font-style: italic;">
+                            <strong>Estabilidade:</strong> os fingerprints do WebGL são altamente estáveis (mesmo hardware = mesma impressão digital)
+                            e diferentes entre fornecedores/modelos de GPU, tornando-as excelentes para identificação de dispositivos.
+                        </p>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <div style="font-weight: 600; color: #495057; margin-bottom: 8px;">Hash do WebGL Fingerprint (SHA-256)</div>
+                        <div style="font-family: 'Courier New', monospace; font-size: 12px; word-break: break-all; color: #212529;">
+                            ${webgl.hash}
+                        </div>
+                        <div style="font-size: 12px; color: #6c757d; margin-top: 8px;">
+                            Este hash é gerado a partir dos dados de hardware da máquina abaixo.
+                        </div>
+                    </div>
+
+                    <h4 style="color: #495057; margin: 25px 0 15px 0; font-size: 16px; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
+                        Hardware Grfico
+                    </h4>
+                    <div class="data-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                        <div class="data-item">
+                            <div class="data-label">Versão do WebGL</div>
+                            <div class="data-value">${webgl.version || 'WebGL 1.0'}</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Fornecedor da GPU</div>
+                            <div class="data-value" style="color: #667eea; font-weight: 600;">
+                                ${webgl.vendor || 'Unknown'}
+                            </div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Renderizador da GPU</div>
+                            <div class="data-value" style="color: #764ba2; font-weight: 600;">
+                                ${webgl.renderer || 'Unknown'}
+                            </div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Linguagem de Sombreamento (Shader Grfico)</div>
+                            <div class="data-value">${webgl.shading_language_version || 'Unknown'}</div>
+                        </div>
+                    </div>
+
+                    <h4 style="color: #495057; margin: 25px 0 15px 0; font-size: 16px; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
+                        Capacidades da GPU
+                    </h4>
+                    <div class="data-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                        <div class="data-item">
+                            <div class="data-label">Tamanho Máximo da Textura</div>
+                            <div class="data-value">${webgl.max_texture_size || 0} px</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Visualização Máxima</div>
+                            <div class="data-value">
+                                ${webgl.max_viewport_width || 0}  ${webgl.max_viewport_height || 0} px
+                            </div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Precisão do Sombreador de Vértices</div>
+                            <div class="data-value">${webgl.vertex_precision || 0} bits</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Precisão do Sombreador de Fragmentos</div>
+                            <div class="data-value">${webgl.fragment_precision || 0} bits</div>
+                        </div>
+                    </div>
+
+                    <h4 style="color: #495057; margin: 25px 0 15px 0; font-size: 16px; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
+                        Extensões Compatveis (${webgl.extensions ? webgl.extensions.length : 0} total)
+                    </h4>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <div style="font-size: 13px; color: #495057; line-height: 1.6;">
+                            ${extensionsPreview}
+                        </div>
+                        ${webgl.extensions && webgl.extensions.length > 5 ? `
+                            <details style="margin-top: 10px;">
+                                <summary style="cursor: pointer; color: #667eea; font-weight: 600; user-select: none;">
+                                    Mostrar todas as ${webgl.extensions.length} extensões
+                                </summary>
+                                <div style="margin-top: 10px; padding: 10px; background: white; border-radius: 6px; max-height: 200px; overflow-y: auto;">
+                                    ${webgl.extensions.map(ext => `<div style="padding: 4px 0; border-bottom: 1px solid #e9ecef; font-size: 12px; font-family: monospace;">${ext}</div>`).join('')}
+                                </div>
+                            </details>
+                        ` : ''}
+                    </div>
+
+                    <h4 style="color: #495057; margin: 25px 0 15px 0; font-size: 16px; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
+                        Hash do Teste de Renderização
+                    </h4>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <div style="font-size: 12px; color: #6c757d; margin-bottom: 8px;">
+                            Amostra de pixels da cena de teste renderizada (região 1616):
+                        </div>
+                        <div style="font-family: 'Courier New', monospace; font-size: 11px; word-break: break-all; color: #212529;">
+                            ${webgl.render_hash || 'N/A'}
+                        </div>
+                        <div style="font-size: 12px; color: #6c757d; margin-top: 8px; font-style: italic;">
+                            Diferentes GPUs e drivers renderizam cenas com variações sutis de pixels, contribuindo para a singularidade.
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('tab-webgl').innerHTML = content;
+        }
+
+        function displayAudio(audio, jsAudio = null) {
+            const fpValue = audio.fingerprint_value || 0;
+            const fpDisplay = fpValue === 0 ? '0.000' :
+                              fpValue < 0.001 ? fpValue.toExponential(3) :
+                              fpValue.toFixed(6);
+            const cppSampleRate = Number(audio?.sample_rate);
+            const jsSampleRate = Number(jsAudio?.sample_rate);
+            const configuredSampleRate = 44100;
+            const sampleRate = cppSampleRate > 0
+                ? cppSampleRate
+                : jsSampleRate > 0
+                    ? jsSampleRate
+                    : configuredSampleRate;
+            const sampleRateDescription = cppSampleRate > 0
+                ? 'Taxa efetiva do buffer C++ & WebAssembly'
+                : jsSampleRate > 0
+                    ? 'Taxa efetiva confirmada pela coleta JavaScript'
+                    : 'Taxa configurada; a coleta não confirmou a taxa efetiva';
+
+            const content = `
+                <div class="data-section">
+                    <h3>Audio Fingerprint</h3>
+
+                    <div style="background: linear-gradient(135deg, #38b2ac 0%, #319795 100%);
+                                color: white;
+                                padding: 20px;
+                                border-radius: 12px;
+                                margin-bottom: 30px;
+                                box-shadow: 0 4px 15px rgba(49, 151, 149, 0.2);">
+                        <h4 style="margin: 0 0 15px 0; font-size: 18px;">
+                            <span style="font-size: 24px;"></span> Como o Audio Fingerprinting funciona?
+                        </h4>
+                        <p style="margin: 0 0 10px 0; line-height: 1.6; opacity: 0.95;">
+                            O Audio Fingerprinting detecta diferenças sutis na forma como os navegadores e sistemas operacionais processam
+                            sinais de audio digital. A técnica explora variações nas implementações de DSP (Digital Signal Processing / Processamento de Sinal Digital) de audio.
+                            O processo:
+                        </p>
+                        <ol style="margin: 10px 0 0 20px; line-height: 1.8; opacity: 0.95;">
+                            <li><strong>Cria um OfflineAudioContext</strong> - Um ambiente virtual de processamento de audio (44,1 kHz, 1 canal, 5000 amostras)</li>
+                            <li><strong>Gera um sinal de teste</strong> - Oscilador de onda triangular com frequência de 10 kHz</li>
+                            <li><strong>Aplica compressão dinâmica</strong> - DynamicsCompressorNode com parâmetros específicos (limite: -50dB, proporção: 12:1)</li>
+                            <li><strong>Renderiza o audio offline</strong> - Processa o sinal sem reproduzi-lo</li>
+                            <li><strong>Analisa a forma de onda de saída</strong> - Calcula a soma absoluta das 5.000 amostras e apresenta sua média</li>
+                        </ol>
+                        <p style="margin: 15px 0 0 0; line-height: 1.6; opacity: 0.95; font-style: italic;">
+                            <strong>Por que é único:</strong> diferentes pilhas de audio (sistema operacional, drivers, implementações de navegador) processam
+                            operações DSP com pequenas variações em matemática de ponto flutuante, arredondamento e algoritmos de compressão.
+                        </p>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <div style="font-weight: 600; color: #495057; margin-bottom: 8px;">Hash do Audio Fingerprint (SHA-256)</div>
+                        <div style="font-family: 'Courier New', monospace; font-size: 12px; word-break: break-all; color: #212529;">
+                            ${audio.hash}
+                        </div>
+                        <div style="font-size: 12px; color: #6c757d; margin-top: 8px;">
+                            Gerado a partir da soma das amplitudes absolutas das 5.000 amostras renderizadas
+                        </div>
+                    </div>
+
+                    <h4 style="color: #495057; margin: 25px 0 15px 0; font-size: 16px; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
+                        Configuração do contexto de audio
+                    </h4>
+                    <div class="data-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                        <div class="data-item">
+                            <div class="data-label">Sample Rate</div>
+                            <div class="data-value" style="color: #fa709a; font-weight: 600;">${sampleRate.toLocaleString('pt-BR')} Hz</div>
+                            <div style="font-size: 11px; color: #6c757d; margin-top: 4px;">${sampleRateDescription}</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Canais</div>
+                            <div class="data-value">1 (Mono)</div>
+                            <div style="font-size: 11px; color: #6c757d; margin-top: 4px;">Canal único para garantir a consistência</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Comprimento do buffer</div>
+                            <div class="data-value">5,000 amostras</div>
+                            <div style="font-size: 11px; color: #6c757d; margin-top: 4px;">~113ms de dados de audio</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Modo de Processamento</div>
+                            <div class="data-value">Offline Rendering (Renderização Offline)</div>
+                            <div style="font-size: 11px; color: #6c757d; margin-top: 4px;">Sem reprodução real</div>
+                        </div>
+                    </div>
+
+                    <h4 style="color: #495057; margin: 25px 0 15px 0; font-size: 16px; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
+                        Cadeia de sinais de audio
+                    </h4>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; justify-content: space-around; flex-wrap: wrap; gap: 15px;">
+                            <div style="flex: 1; min-width: 150px; text-align: center; padding: 15px; background: white; border-radius: 8px; border: 2px solid #fa709a;">
+                                <div style="font-size: 32px; margin-bottom: 8px;"></div>
+                                <div style="font-weight: 600; color: #495057; margin-bottom: 5px;">Oscilador</div>
+                                <div style="font-size: 12px; color: #6c757d;">
+                                    Tipo: <strong>Onda triangular</strong><br>
+                                    Frequência: <strong>10.000 Hz</strong>
+                                </div>
+                            </div>
+
+                            <div style="font-size: 24px; color: #dee2e6;"></div>
+
+                            <div style="flex: 1; min-width: 150px; text-align: center; padding: 15px; background: white; border-radius: 8px; border: 2px solid #fee140;">
+                                <div style="font-size: 32px; margin-bottom: 8px;"></div>
+                                <div style="font-weight: 600; color: #495057; margin-bottom: 5px;">Compressor dinâmico</div>
+                                <div style="font-size: 11px; color: #6c757d; text-align: left;">
+                                     Limiar: <strong>-50 dB</strong><br>
+                                     Curva: <strong>40 dB</strong><br>
+                                     Relação: <strong>12:1</strong><br>
+                                     Ataque: <strong>0,0 s</strong><br>
+                                     Liberação: <strong>0,25 s</strong>
+                                </div>
+                            </div>
+
+                            <div style="font-size: 24px; color: #dee2e6;"></div>
+
+                            <div style="flex: 1; min-width: 150px; text-align: center; padding: 15px; background: white; border-radius: 8px; border: 2px solid #a8edea;">
+                                <div style="font-size: 32px; margin-bottom: 8px;"></div>
+                                <div style="font-weight: 600; color: #495057; margin-bottom: 5px;">Buffer de análise</div>
+                                <div style="font-size: 12px; color: #6c757d;">
+                                    Audio compactado<br>pronto para análise
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 style="color: #495057; margin: 25px 0 15px 0; font-size: 16px; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
+                        Análise de forma de onda
+                    </h4>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <div class="data-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                            <div style="text-align: center; padding: 15px; background: white; border-radius: 6px;">
+                                <div style="font-size: 24px; color: #fa709a; font-weight: 600; margin-bottom: 5px;">
+                                    ${fpDisplay}
+                                </div>
+                                <div style="font-size: 12px; color: #495057; font-weight: 600;">Soma das Amostras</div>
+                                <div style="font-size: 11px; color: #6c757d; margin-top: 4px;">
+                                    Amplitude absoluta total
+                                </div>
+                            </div>
+                            <div style="text-align: center; padding: 15px; background: white; border-radius: 6px;">
+                                <div style="font-size: 24px; color: #fee140; font-weight: 600; margin-bottom: 5px;">
+                                    ${(fpValue / 5000).toExponential(3)}
+                                </div>
+                                <div style="font-size: 12px; color: #495057; font-weight: 600;">Amplitude média</div>
+                                <div style="font-size: 11px; color: #6c757d; margin-top: 4px;">
+                                    Intensidade média do sinal
+                                </div>
+                            </div>
+                            <div style="text-align: center; padding: 15px; background: white; border-radius: 6px;">
+                                <div style="font-size: 24px; color: #a8edea; font-weight: 600; margin-bottom: 5px;">
+                                    5,000
+                                </div>
+                                <div style="font-size: 12px; color: #495057; font-weight: 600;">Total de Amostras</div>
+                                <div style="font-size: 11px; color: #6c757d; margin-top: 4px;">
+                                    Pontos de dados analisados
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 6px; border-left: 4px solid #fa709a;">
+                            <div style="font-weight: 600; color: #495057; margin-bottom: 8px;"> Métricas da janela analisada</div>
+                            <div style="font-size: 13px; color: #6c757d; line-height: 1.6;">
+                                O fingerprint utiliza uma janela completa de 5.000 amostras:
+                                    <ul style="margin: 8px 0 0 20px;">
+                                    <li><strong>Soma absoluta</strong> - Soma das amplitudes absolutas usada para gerar o hash</li>
+                                    <li><strong>Amplitude média</strong> - Soma absoluta dividida pelas 5.000 amostras</li>
+                                    <li><strong>Janela completa</strong> - Todos os pontos do buffer renderizado participam do cálculo</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 style="color: #495057; margin: 25px 0 15px 0; font-size: 16px; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
+                        Por que esses parâmetros?
+                    </h4>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                        <div style="display: grid; gap: 15px;">
+                            <div style="padding: 12px; background: white; border-radius: 6px; border-left: 3px solid #fa709a;">
+                                <div style="font-weight: 600; color: #495057; margin-bottom: 5px;"> Onda triangular a 10 kHz</div>
+                                <div style="font-size: 13px; color: #6c757d; line-height: 1.6;">
+                                    As ondas triangulares contêm harmônicas ímpares que são sensíveis a erros de arredondamento do DSP.
+                                    10 kHz é alta o suficiente para revelar diferenças de implementação, mas baixa o suficiente para ser processada de forma consistente.
+                                </div>
+                            </div>
+                            <div style="padding: 12px; background: white; border-radius: 6px; border-left: 3px solid #fee140;">
+                                <div style="font-weight: 600; color: #495057; margin-bottom: 5px;"> Compressão agressiva (proporção de 12:1)</div>
+                                <div style="font-size: 13px; color: #6c757d; line-height: 1.6;">
+                                    Altas taxas de compressão amplificam pequenas diferenças na forma como os motores de audio lidam com a redução de ganho,
+                                    detecção de envelope e curvas de ataque/liberação. Cada combinação de navegador/sistema operacional produz resultados únicos.
+                                </div>
+                            </div>
+                            <div style="padding: 12px; background: white; border-radius: 6px; border-left: 3px solid #a8edea;">
+                            <div style="font-weight: 600; color: #495057; margin-bottom: 5px;"> Análise da amplitude</div>
+                            <div style="font-size: 13px; color: #6c757d; line-height: 1.6;">
+                                    A soma absoluta sobre todas as 5.000 amostras condensa as variações da forma de onda em um valor determinístico,
+                                    usado como entrada para o hash do Audio Fingerprint.
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px;">
+                        <div style="font-weight: 600; margin-bottom: 8px;">Implementação técnica</div>
+                        <div style="font-size: 13px; opacity: 0.95; line-height: 1.6;">
+                            Essa impressão digital usa o <strong>OfflineAudioContext da API Web Audio</strong>, que processa audio
+                            sem reprodução real. Toda a operação é concluída de forma totalmente silenciosa para o usuário.
+                            Os dados da forma de onda resultantes são analisados na memória usando WebAssembly para obter o máximo desempenho.
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('tab-audio').innerHTML = content;
+        }
+
+        function displayBrowser(browser) {
+            const formatValue = (value) => {
+                if (Array.isArray(value)) {
+                    return value.length > 0 ? value.join(', ') : 'Nenhum';
+                } else if (typeof value === 'boolean') {
+                    return value ? 'Sim' : 'Não';
+                } else if (value === null || value === undefined || value === '') {
+                    return '<span style="color: #adb5bd;">N/A</span>';
+                }
+                return value;
+            };
+
+            const categories = {
+                platform: {
+                    icon: '',
+                    title: 'Plataforma & Sistema Operacional',
+                    color: '#2c5282',
+                    attrs: ['platform', 'user_agent', 'vendor', 'product', 'app_version', 'app_name']
+                },
+                screen: {
+                    icon: '',
+                    title: 'Tela & Display',
+                    color: '#3182ce',
+                    attrs: ['screen_width', 'screen_height', 'screen_avail_width', 'screen_avail_height',
+                            'screen_color_depth', 'screen_pixel_depth', 'screen_resolution', 'pixel_ratio',
+                            'inner_width', 'inner_height', 'outer_width', 'outer_height']
+                },
+                hardware: {
+                    icon: '',
+                    title: 'Capacidades do Hardware',
+                    color: '#38b2ac',
+                    attrs: ['hardware_concurrency', 'device_memory', 'max_touch_points']
+                },
+                locale: {
+                    icon: '',
+                    title: 'Idioma e Fuso Horário',
+                    color: '#319795',
+                    attrs: ['language', 'languages', 'timezone', 'timezone_offset']
+                },
+                storage: {
+                    icon: '',
+                    title: 'Suporte de Armazenamento',
+                    color: '#2f855a',
+                    attrs: ['local_storage', 'session_storage', 'indexed_db']
+                },
+                apis: {
+                    icon: '',
+                    title: 'Suporte a API',
+                    color: '#4299e1',
+                    attrs: ['canvas_support', 'webgl_support', 'webgl2_support', 'media_devices']
+                },
+                features: {
+                    icon: '',
+                    title: 'Recursos do Navegador',
+                    color: '#1e3a5f',
+                    attrs: ['cookie_enabled', 'do_not_track', 'online', 'webdriver', 'plugins_count']
+                },
+                fonts: {
+                    icon: '',
+                    title: 'Fontes Disponveis',
+                    color: '#d69e2e',
+                    attrs: ['fonts_available']
+                }
+            };
+
+            const content = `
+                <div class="data-section">
+                    <h3>Browser Fingerprint</h3>
+
+                    <div style="background: linear-gradient(135deg, #2f855a 0%, #276749 100%);
+                                color: white;
+                                padding: 20px;
+                                border-radius: 12px;
+                                margin-bottom: 30px;
+                                box-shadow: 0 4px 15px rgba(47, 133, 90, 0.2);">
+                        <h4 style="margin: 0 0 15px 0; font-size: 18px;">
+                            <span style="font-size: 24px;"></span> Como o Browser Fingerprinting funciona?
+                        </h4>
+                        <p style="margin: 0 0 10px 0; line-height: 1.6; opacity: 0.95;">
+                            O Browser Fingerprinting coleta um conjunto abrangente de características do dispositivo e do navegador que,
+                            quando combinadas, criam uma assinatura única. Ao contrário dos cookies, esses dados vêm do próprio navegador
+                            e não podem ser facilmente apagados. O sistema coleta:
+                        </p>
+                        <ol style="margin: 10px 0 0 20px; line-height: 1.8; opacity: 0.95;">
+                            <li><strong>Informações da plataforma</strong> - Sistema operacional, fornecedor do navegador, string do agente do usuário</li>
+                            <li><strong>Características da tela</strong> - Resolução, profundidade de cor, proporção de pixels, dimensões da janela de visualização</li>
+                            <li><strong>Recursos de hardware</strong> - Núcleos da CPU, memória disponível, suporte a toque</li>
+                            <li><strong>Configurações regionais</strong> - Idiomas, fuso horário, preferências regionais</li>
+                            <li><strong>Suporte a API</strong> - Quais APIs web modernas estão disponíveis</li>
+                            <li><strong>Recursos do navegador</strong> - Cookies, plug-ins, Não rastrear, status online</li>
+                        </ol>
+                        <p style="margin: 15px 0 0 0; line-height: 1.6; opacity: 0.95; font-style: italic;">
+                            <strong>Exclusividade combinada:</strong> Embora os atributos individuais possam ser comuns, a combinação
+                            de mais de 40 características cria uma impressão digital altamente exclusiva. Esses dados são estáveis entre as sessões
+                            e ajudam a identificar dispositivos mesmo quando os usuários trocam de navegador.
+                        </p>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                        <div style="background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+                                    color: white;
+                                    padding: 20px;
+                                    border-radius: 10px;
+                                    text-align: center;">
+                            <div style="font-size: 36px; font-weight: 700; margin-bottom: 5px;">
+                                8
+                            </div>
+                            <div style="font-size: 14px; opacity: 0.9;">Categorias de dados</div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+                                    color: white;
+                                    padding: 20px;
+                                    border-radius: 10px;
+                                    text-align: center;">
+                            <div style="font-size: 36px; font-weight: 700; margin-bottom: 5px;">
+                                45%
+                            </div>
+                            <div style="font-size: 14px; opacity: 0.9;">Ponderação na Similaridade</div>
+                        </div>
+                    </div>
+
+                    ${Object.entries(categories).map(([catKey, category]) => {
+                        const attrs = category.attrs
+                            .map(attr => ({ key: attr, value: browser[attr] }))
+                            .filter(item => item.value !== undefined);
+
+                        if (attrs.length === 0) return '';
+
+                        return `
+                            <div style="margin-bottom: 30px;">
+                                <h4 style="color: #495057;
+                                           margin: 0 0 15px 0;
+                                           font-size: 16px;
+                                           display: flex;
+                                           align-items: center;
+                                           gap: 8px;
+                                           padding-bottom: 10px;
+                                           border-bottom: 3px solid ${category.color};">
+                                    <span style="font-size: 24px;">${category.icon}</span>
+                                    ${category.title}
+                                    <span style="background: ${category.color};
+                                                 color: white;
+                                                 padding: 2px 8px;
+                                                 border-radius: 12px;
+                                                 font-size: 11px;
+                                                 font-weight: 600;
+                                                 margin-left: auto;">
+                                        ${attrs.length} ${attrs.length === 1 ? 'atributo' : 'atributos'}
+                                    </span>
+                                </h4>
+
+                                <div class="data-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                                    ${attrs.map(({ key, value }) => {
+                                        let displayValue = formatValue(value);
+
+                                        if (key === 'languages' && Array.isArray(value)) {
+                                            displayValue = `
+                                                <div style="font-size: 13px;">
+                                                    ${value.slice(0, 3).join(', ')}
+                                                    ${value.length > 3 ? `<span style="color: #6c757d;"> (+${value.length - 3} mais)</span>` : ''}
+                                                </div>
+                                            `;
+                                        } else if (key === 'user_agent') {
+                                            displayValue = `<div style="font-size: 11px; line-height: 1.4; word-break: break-word;">${value}</div>`;
+                                        } else if (key === 'fonts_available' && Array.isArray(value)) {
+                                            displayValue = `
+                                                <div style="font-size: 13px;">
+                                                    ${value.length} fontes detectadas
+                                                    ${value.length > 0 ? `
+                                                        <details style="margin-top: 8px;">
+                                                            <summary style="cursor: pointer; color: ${category.color}; font-weight: 600; user-select: none; font-size: 12px;">
+                                                                Mostrar todas as Fontes
+                                                            </summary>
+                                                            <div style="margin-top: 8px; padding: 10px; background: #f8f9fa; border-radius: 6px; max-height: 150px; overflow-y: auto;">
+                                                                ${value.map(font => `<div style="padding: 3px 0; font-size: 11px; font-family: monospace;">${font}</div>`).join('')}
+                                                            </div>
+                                                        </details>
+                                                    ` : ''}
+                                                </div>
+                                            `;
+                                        }
+
+                                        return `
+                                            <div class="data-item" style="border-left: 3px solid ${category.color};">
+                                                <div class="data-label">${formatLabel(key)}</div>
+                                                <div class="data-value">${displayValue}</div>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+
+                    <h4 style="color: #495057; margin: 30px 0 15px 0; font-size: 16px; border-bottom: 2px solid #dee2e6; padding-bottom: 8px;">
+                         Por que esses atributos são importantes?
+                    </h4>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                        <div style="display: grid; gap: 15px;">
+                            <div style="padding: 12px; background: white; border-radius: 6px; border-left: 3px solid #667eea;">
+                                <div style="font-weight: 600; color: #495057; margin-bottom: 5px;"> Tela e hardware</div>
+                                <div style="font-size: 13px; color: #6c757d; line-height: 1.6;">
+                                    A resolução da tela, a profundidade de cor e a proporção de pixels variam significativamente entre os dispositivos.
+                                    Combinadas com os recursos de hardware (núcleos da CPU, memória), elas criam uma assinatura única para cada dispositivo.
+                                </div>
+                            </div>
+                            <div style="padding: 12px; background: white; border-radius: 6px; border-left: 3px solid #2575fc;">
+                                <div style="font-weight: 600; color: #495057; margin-bottom: 5px;"> Localidade e Fuso Horário</div>
+                                <div style="font-size: 13px; color: #6c757d; line-height: 1.6;">
+                                    As preferências de idioma e as configurações de fuso horário são identificadores estáveis que refletem a localização do usuário
+                                    e as configurações regionais, raramente alteradas pelos usuários.
+                                </div>
+                            </div>
+                            <div style="padding: 12px; background: white; border-radius: 6px; border-left: 3px solid #11998e;">
+                                <div style="font-weight: 600; color: #495057; margin-bottom: 5px;"> Suporte a API</div>
+                                <div style="font-size: 13px; color: #6c757d; line-height: 1.6;">
+                                    Diferentes navegadores e versões suportam diferentes APIs. Isso cria uma assinatura específica da versão
+                                    que ajuda a identificar os tipos de navegador e o status da atualização.
+                                </div>
+                            </div>
+                            <div style="padding: 12px; background: white; border-radius: 6px; border-left: 3px solid #fa709a;">
+                                <div style="font-weight: 600; color: #495057; margin-bottom: 5px;"> Disponibilidade de fontes</div>
+                                <div style="font-size: 13px; color: #6c757d; line-height: 1.6;">
+                                    As fontes instaladas variam de acordo com o sistema operacional e as preferências do usuário. As listas de fontes são identificadores
+                                    surpreendentemente únicos, especialmente em sistemas com fontes personalizadas instaladas.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%); color: white; border-radius: 8px;">
+                        <div style="font-weight: 600; margin-bottom: 8px;"> Privacidade e Identificação entre Navegadores</div>
+                        <div style="font-size: 13px; opacity: 0.95; line-height: 1.6;">
+                            Embora esses atributos sejam comuns individualmente, sua <strong>combinação cria exclusividade</strong>.
+                            O Browser Fingerprinting foi projetado para identificar o <strong>mesmo dispositivo em diferentes navegadores</strong>.
+                            Por exemplo: mesma resolução de tela + mesmos núcleos de CPU + mesmo fuso horário + mesmas fontes instaladas = provavelmente
+                            o mesmo dispositivo físico, mesmo se estiver usando o Chrome ou o Firefox.
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('tab-browser').innerHTML = content;
+        }
+
+        function displayPerformance(timing) {
+            const target = document.getElementById('tab-performance');
+            if (!target) return;
+
+            if (!timing) {
+                if (performanceChart) {
+                    performanceChart.destroy();
+                    performanceChart = null;
+                }
+                target.innerHTML = `
+                    <div class="data-section">
+                        <h3> Performance</h3>
+                        <p style="color: var(--text-muted);">Colete um fingerprint para ver os tempos de execução.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const jsAvgText = timing.jsAvg !== null
+                ? `${timing.jsAvg.toFixed(2)} ms`
+                : 'Sem dados (falha na execução JS)';
+
+            target.innerHTML = `
+                <div class="data-section">
+                    <h3>Performance das Coletas</h3>
+                    <div class="timing-meta" style="color: var(--text-secondary); margin-bottom: 12px;">
+                        Coleta cronometrada em execução única, sem warmup.
+                    </div>
+                    <div class="hash-grid">
+                        <div class="hash-card" style="background: white; color: var(--text-dark); border: 1px solid var(--border);">
+                            <div style="font-weight: 700; margin-bottom: 6px; text-align: center;">C++ & WebAssembly</div>
+                            <div class="hash-value" style="background: var(--bg-secondary); color: var(--text-dark);">${timing.cppAvg.toFixed(2)} ms</div>
+                        </div>
+                        <div class="hash-card" style="background: white; color: var(--text-dark); border: 1px solid var(--border);">
+                            <div style="font-weight: 700; margin-bottom: 6px; text-align: center;">JavaScript</div>
+                            <div class="hash-value" style="background: var(--bg-secondary); color: var(--text-dark);">${jsAvgText}</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <h4 style="margin-bottom: 10px; color: var(--text-dark);">Tempo por Execução (ms)</h4>
+                        <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border); min-height: 220px;">
+                            <canvas id="performanceChart" height="180"></canvas>
+                        </div>
+                    </div>
+                    <div style="margin-top: 16px; font-size: 0.9em; color: var(--text-secondary);">
+                        As coletas são cronometradas com <code>performance.now()</code> ao redor de cada chamada.
+                        O gráfico exibe os tempos da execução atual.
+                    </div>
+                </div>
+            `;
+            renderPerformanceChart(timing);
+        }
+
+        function renderPerformanceChart(timing) {
+            const canvas = document.getElementById('performanceChart');
+            if (!canvas || !window.Chart) return;
+
+            const labels = Array.from({ length: timing.totalRuns || timing.cppSeries.length }, (_, idx) => `${idx + 1}`);
+            const cppData = timing.cppSeries || [];
+            const jsData = timing.jsSeries || [];
+
+            const allValues = [...cppData, ...jsData].filter(v => v !== null && v !== undefined);
+            const minVal = allValues.length ? Math.min(...allValues) : 0;
+            const maxVal = allValues.length ? Math.max(...allValues) : 1;
+            const range = Math.max(1, maxVal - minVal);
+            const padding = range * 0.2;
+            const suggestedMin = Math.max(0, minVal - padding);
+            const suggestedMax = maxVal + padding;
+
+            if (performanceChart) {
+                performanceChart.destroy();
+            }
+
+            performanceChart = new Chart(canvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Tempo C++ & WebAssembly',
+                            data: cppData,
+                            borderColor: '#1e3a5f',
+                            backgroundColor: 'rgba(30,58,95,0.35)',
+                            borderWidth: 2,
+                            borderRadius: 6,
+                            maxBarThickness: 28
+                        },
+                        {
+                            label: 'Tempo JavaScript',
+                            data: jsData,
+                            borderColor: '#3182ce',
+                            backgroundColor: 'rgba(49,130,206,0.35)',
+                            borderWidth: 2,
+                            borderRadius: 6,
+                            maxBarThickness: 28
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'nearest', intersect: false },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Execução' }
+                        },
+                        y: {
+                            title: { display: true, text: 'Tempo (ms)' },
+                            beginAtZero: false,
+                            suggestedMin,
+                            suggestedMax,
+                            ticks: {
+                                callback: value => `${value} ms`
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => {
+                                    const y = ctx.parsed.y;
+                                    if (y === null || y === undefined) {
+                                        return `${ctx.dataset.label}: sem dado`;
+                                    }
+                                    return `${ctx.dataset.label}: ${y.toFixed(2)} ms`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function formatLabel(key) {
+            const labels = {
+                platform: 'Plataforma',
+                user_agent: 'Agente do usuário',
+                vendor: 'Fornecedor do navegador',
+                product: 'Produto',
+                product_sub: 'Subproduto',
+                app_version: 'Versão do aplicativo',
+                app_name: 'Nome do aplicativo',
+                app_code_name: 'Codinome do aplicativo',
+                screen_width: 'Largura da tela',
+                screen_height: 'Altura da tela',
+                screen_avail_width: 'Largura disponível da tela',
+                screen_avail_height: 'Altura disponível da tela',
+                screen_color_depth: 'Profundidade de cor da tela',
+                screen_pixel_depth: 'Profundidade de pixels da tela',
+                screen_resolution: 'Resolução da tela',
+                pixel_ratio: 'Proporção de pixels',
+                inner_width: 'Largura interna da janela',
+                inner_height: 'Altura interna da janela',
+                outer_width: 'Largura externa da janela',
+                outer_height: 'Altura externa da janela',
+                hardware_concurrency: 'Processadores lógicos',
+                device_memory: 'Memória do dispositivo',
+                max_touch_points: 'Máximo de pontos de toque',
+                language: 'Idioma principal',
+                languages: 'Idiomas',
+                timezone: 'Fuso horário',
+                timezone_offset: 'Deslocamento do fuso horário',
+                local_storage: 'Armazenamento local',
+                session_storage: 'Armazenamento da sessão',
+                indexed_db: 'Banco de dados IndexedDB',
+                canvas_support: 'Suporte ao Canvas',
+                webgl_support: 'Suporte ao WebGL',
+                webgl2_support: 'Suporte ao WebGL 2',
+                media_devices: 'Dispositivos de mídia',
+                cookie_enabled: 'Cookies habilitados',
+                do_not_track: 'Preferência Não Rastrear',
+                online: 'Conectado',
+                webdriver: 'Automação WebDriver',
+                plugins_count: 'Quantidade de plugins',
+                fonts_available: 'Fontes disponíveis',
+                java_enabled: 'Java habilitado'
+            };
+
+            return labels[key] || key
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, letter => letter.toUpperCase());
+        }
+
+        window.openFingerprintModal = function(componentName) {
+            const sourceContainer = document.getElementById(`tab-${componentName}`);
+            const modal = document.getElementById('fingerprintModal');
+            const modalContent = document.getElementById('fingerprintModalContent');
+            const closeButton = modal?.querySelector('.fingerprint-modal-close');
+
+            if (!sourceContainer || !modal || !modalContent) return;
+            if (!sourceContainer.innerHTML.trim()) return;
+
+            modalContent.innerHTML = sourceContainer.innerHTML;
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
+            closeButton?.focus();
+        };
+
+        window.closeFingerprintModal = function() {
+            const modal = document.getElementById('fingerprintModal');
+            const modalContent = document.getElementById('fingerprintModalContent');
+
+            if (!modal || !modalContent) return;
+
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+            modalContent.innerHTML = '';
+            document.body.classList.remove('modal-open');
+        };
+
+        window.handleOverviewCardKeydown = function(event, tabName) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                window.openFingerprintModal(tabName);
+            }
+        };
+
+        document.addEventListener('keydown', event => {
+            const modal = document.getElementById('fingerprintModal');
+            if (event.key === 'Escape' && modal?.classList.contains('active')) {
+                window.closeFingerprintModal();
+            }
+        });
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type} active`;
+        }
+
+        function setCollectionLoading(isLoading, message = '') {
+            const loader = document.getElementById('collectionLoader');
+            const messageEl = document.getElementById('collectionLoaderMessage');
+            if (!loader) return;
+
+            loader.classList.toggle('active', Boolean(isLoading));
+            loader.setAttribute('aria-busy', isLoading ? 'true' : 'false');
+
+            if (message && messageEl) {
+                messageEl.textContent = message;
+            }
+        }
+
+        window.clearResults = function() {
+            fingerprintData = null;
+            jsFingerprintData = null;
+            currentSessionId = null;
+            lastTiming = null;
+            if (performanceChart) {
+                performanceChart.destroy();
+                performanceChart = null;
+            }
+            document.getElementById('results').classList.remove('active');
+            document.getElementById('fingerprintHash').classList.remove('active');
+            document.getElementById('fingerprintJson').classList.remove('active');
+            document.getElementById('status').classList.remove('active');
+            document.getElementById('clearBtn').disabled = true;
+            window.closeFingerprintModal();
+            document.getElementById('tab-overview').innerHTML = '';
+            document.getElementById('tab-canvas').innerHTML = '';
+            document.getElementById('tab-webgl').innerHTML = '';
+            document.getElementById('tab-audio').innerHTML = '';
+            document.getElementById('tab-browser').innerHTML = '';
+            console.log(' Results cleared');
+        };
+
+        window.recollectFingerprint = async function() {
+            if (isCollectingFingerprint) return;
+            window.clearResults();
+            await window.collectFingerprint();
+        };
+
+        window.scrollToTopPage = function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        };
+
+        window.collectFingerprint();
+    </script>
+</body>
+</html>

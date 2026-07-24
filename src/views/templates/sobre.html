@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre - Ferramenta de Web Fingerprint</title>
+
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="manifest" href="/assets/site.webmanifest">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #1e3a5f;
+            --primary-dark: #0f1e3a;
+            --accent: #3182ce;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --border: #e2e8f0;
+            --shadow: 0 3px 12px rgba(15, 30, 58, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+            color: var(--text-primary);
+            background: linear-gradient(180deg, #eef3f9 0, #f7fafc 220px, #f7fafc 100%);
+            min-height: 100vh;
+        }
+
+        .page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(110deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: #fff;
+            padding: 22px clamp(18px, 3.5vw, 56px) 18px;
+            border-bottom: 4px solid var(--accent);
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .header h1 {
+            font-family: 'Merriweather', Georgia, serif;
+            font-size: clamp(1.55rem, 1.5vw, 2.2rem);
+            margin-bottom: 0;
+        }
+
+        .header-links {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-link {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 100;
+            font-size: clamp(0.98rem, 1vw, 2.2rem);
+            font-family: 'Merriweather', Georgia, serif;
+            line-height: 1;
+            white-space: nowrap;
+            opacity: 0.94;
+        }
+
+        .main {
+            flex: 1;
+            padding: clamp(20px, 3vw, 36px) clamp(18px, 4vw, 72px) 36px;
+            max-width: 1180px;
+            width: 100%;
+            margin: 0 auto;
+            display: grid;
+            gap: 22px;
+            align-content: start;
+        }
+
+        .section {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .section h2 {
+            font-family: 'Merriweather', Georgia, serif;
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 1.28rem;
+        }
+
+        .section p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+
+        .placeholder {
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            background: #f8fbff;
+            padding: 16px;
+            margin-top: 12px;
+        }
+
+        .placeholder strong {
+            color: var(--primary-dark);
+        }
+
+        @media (max-width: 760px) {
+            .header-row {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header class="header">
+            <div class="header-row">
+                <h1>Ferramenta de Web Fingerprint</h1>
+                <div class="header-links">
+                    <a href="/" class="header-link">Início</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <section class="section">
+                <h2>Sobre o Projeto</h2>
+                <p>
+                    Esta ferramenta foi desenvolvida no contexto de uma pesquisa de doutorado sobre Web Fingerprinting e WebAssembly. 
+                    O objetivo do projeto é estudar como atributos técnicos do navegador e do dispositivo podem ser utilizados para gerar um fingerprint, isto é, um identificador formado a partir de características observáveis durante a navegação. 
+                </p>
+                <p>
+                    Nesse contexto, a ferramenta tem finalidade exclusivamente acadêmica. 
+                    Sua função é apoiar a realização dos experimentos previstos na pesquisa, permitindo observar como 
+                    a coleta de atributos ocorre na prática e como técnicas implementadas com C++ e WebAssembly 
+                    podem ser avaliadas em navegadores modernos. 
+                    Assim, a ferramenta não foi criada para fins comerciais, publicitários ou de monitoramento de usuários
+                     fora do escopo científico da pesquisa.
+                </p>
+            </section>
+
+        </main>
+
+    </div>
+</body>
+</html>

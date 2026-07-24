@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Fingerprint System</title>
+    <style>
+        :root {
+            --primary: #1e3a5f;
+            --primary-light: #2c5282;
+            --primary-dark: #0f1e3a;
+            --accent: #3182ce;
+            --accent-light: #4299e1;
+
+            --success: #2f855a;
+            --error: #c53030;
+            --warning: #d69e2e;
+
+            --bg-light: #f7fafc;
+            --bg-card: #ffffff;
+            --bg-secondary: #edf2f7;
+
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            --text-light: #a0aec0;
+
+            --border: #e2e8f0;
+            --border-dark: #cbd5e0;
+
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 32px 40px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-content h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header-content p {
+            font-size: 15px;
+            opacity: 0.9;
+        }
+
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-icon {
+            font-size: 32px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .stat-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .actions-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            text-decoration: none;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e53e3e 0%, var(--error) 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(197, 48, 48, 0.3);
+        }
+
+        .logs-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            display: none;
+        }
+
+        .logs-section.show {
+            display: block;
+        }
+
+        .logs-container {
+            background: var(--bg-light);
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .log-entry:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--accent-light);
+        }
+
+        .log-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .log-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .log-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 100px;
+        }
+
+        .log-value {
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            word-break: break-all;
+        }
+
+        .loading {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px 20px;
+            font-size: 15px;
+        }
+
+        .error {
+            background: #ffebee;
+            color: var(--error);
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid var(--error);
+            font-weight: 500;
+        }
+
+        .success {
+            background: #e8f5e9;
+            color: var(--success);
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid var(--success);
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .logs-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .logs-container::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 4px;
+        }
+
+        .logs-container::-webkit-scrollbar-thumb {
+            background: var(--border-dark);
+            border-radius: 4px;
+        }
+
+        .logs-container::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>🔐 Dashboard de Controle</h1>
+                <p>Painel de Gerenciamento de Fingerprints</p>
+            </div>
+            <button onclick="handleLogout()" class="btn-logout">
+                <span>🚪</span>
+                <span>Sair</span>
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">📊</div>
+                </div>
+                <div class="stat-label">Total de Fingerprints</div>
+                <div class="stat-value" id="totalFingerprints">-</div>
+                <div class="stat-description">Fingerprints coletados no total</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">🔑</div>
+                </div>
+                <div class="stat-label">Fingerprints Únicos</div>
+                <div class="stat-value" id="uniqueFingerprints">-</div>
+                <div class="stat-description">Dispositivos únicos identificados</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">🔄</div>
+                </div>
+                <div class="stat-label">Usuários Recorrentes</div>
+                <div class="stat-value" id="returningUsers">-</div>
+                <div class="stat-description">Usuários que retornaram</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">📈</div>
+                </div>
+                <div class="stat-label">Média Sessões/Usuário</div>
+                <div class="stat-value" id="avgSessions">-</div>
+                <div class="stat-description">Sessões por fingerprint único</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">⏰</div>
+                </div>
+                <div class="stat-label">Atividade 24h</div>
+                <div class="stat-value" id="recentActivity">-</div>
+                <div class="stat-description">Fingerprints nas últimas 24h</div>
+            </div>
+        </div>
+
+        <div class="actions-section">
+            <h2 class="section-title">
+                <span>⚙️</span>
+                <span>Gerenciamento de Dados</span>
+            </h2>
+            <div class="actions-grid">
+                <a href="/admin/logs/download" class="btn btn-primary">
+                    <span>📥</span>
+                    <span>Baixar Logs (JSON)</span>
+                </a>
+                <button onclick="viewLogs()" class="btn btn-secondary">
+                    <span>📝</span>
+                    <span>Visualizar Logs Recentes</span>
+                </button>
+                <button onclick="resetLogs()" class="btn btn-danger">
+                    <span>🗑️</span>
+                    <span>Resetar Todos os Logs</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="actions-section">
+            <h2 class="section-title">
+                <span>🔍</span>
+                <span>Comparação de Fingerprints</span>
+            </h2>
+            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 14px;">
+                Compare dois fingerprints para verificar se pertencem ao mesmo dispositivo. Cole os JSON completos dos fingerprints abaixo.
+            </p>
+
+            <div style="display: grid; gap: 20px; margin-bottom: 20px;">
+                <div>
+                    <label for="fp1" style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">
+                        Fingerprint 1:
+                    </label>
+                    <textarea
+                        id="fp1"
+                        placeholder='{"fingerprint_hash": "...", "canvas_fingerprint": {...}, ...}'
+                        style="width: 100%; min-height: 120px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px; resize: vertical;"
+                    ></textarea>
+                </div>
+
+                <div>
+                    <label for="fp2" style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">
+                        Fingerprint 2:
+                    </label>
+                    <textarea
+                        id="fp2"
+                        placeholder='{"fingerprint_hash": "...", "canvas_fingerprint": {...}, ...}'
+                        style="width: 100%; min-height: 120px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px; resize: vertical;"
+                    ></textarea>
+                </div>
+            </div>
+
+            <button onclick="compareFingerprints()" class="btn btn-primary" style="width: 100%;">
+                <span>🔍</span>
+                <span>Comparar Fingerprints</span>
+            </button>
+
+            <div id="comparisonResult" style="margin-top: 20px; display: none;"></div>
+        </div>
+
+        <div class="logs-section" id="logsSection">
+            <h2 class="section-title">
+                <span>📝</span>
+                <span>Logs Recentes (últimos 20)</span>
+            </h2>
+            <div class="logs-container" id="logsContainer">
+                <div class="loading">Carregando logs...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const stats = await response.json();
+                console.log('Stats loaded:', stats);
+
+                document.getElementById('totalFingerprints').textContent =
+                    (stats.totalFingerprints || 0).toLocaleString('pt-BR');
+
+                document.getElementById('uniqueFingerprints').textContent =
+                    (stats.uniqueFingerprints || 0).toLocaleString('pt-BR');
+
+                document.getElementById('returningUsers').textContent =
+                    (stats.returningUsers || 0).toLocaleString('pt-BR');
+
+                const avgSessions = parseFloat(stats.averageSessionsPerFingerprint) || 0;
+                document.getElementById('avgSessions').textContent =
+                    avgSessions.toFixed(2);
+
+                document.getElementById('recentActivity').textContent =
+                    (stats.recentActivity || 0).toLocaleString('pt-BR');
+
+                document.querySelectorAll('.stat-value').forEach(el => {
+                    el.style.color = 'var(--primary)';
+                });
+
+            } catch (error) {
+                console.error('Failed to load statistics:', error);
+                console.error('Error details:', error.message);
+
+                document.querySelectorAll('.stat-value').forEach(el => {
+                    el.textContent = 'Erro';
+                    el.style.color = 'var(--error)';
+                });
+            }
+        }
+
+        async function viewLogs() {
+            const logsSection = document.getElementById('logsSection');
+            const logsContainer = document.getElementById('logsContainer');
+
+            logsSection.classList.add('show');
+            logsContainer.innerHTML = '<div class="loading">Carregando logs...</div>';
+
+            logsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            try {
+                const response = await fetch('/admin/logs/view?limit=20');
+                const data = await response.json();
+
+                if (data.success && data.logs && data.logs.length > 0) {
+                    const logsHtml = data.logs.map(log => `
+                        <div class="log-entry">
+                            <div class="log-row">
+                                <div class="log-label">ID:</div>
+                                <div class="log-value">${escapeHtml(log.id?.substring(0, 32) || 'N/A')}...</div>
+                            </div>
+                            <div class="log-row">
+                                <div class="log-label">Timestamp:</div>
+                                <div class="log-value">${escapeHtml(new Date(log.serverTimestamp).toLocaleString('pt-BR'))}</div>
+                            </div>
+                            <div class="log-row">
+                                <div class="log-label">Session ID:</div>
+                                <div class="log-value">${escapeHtml(log.sessionId || 'N/A')}</div>
+                            </div>
+                            <div class="log-row">
+                                <div class="log-label">FP Hash:</div>
+                                <div class="log-value">${escapeHtml((log.cpp_fingerprint || log.data)?.fingerprint_hash?.substring(0, 32) || 'N/A')}...</div>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    logsContainer.innerHTML = logsHtml;
+                } else {
+                    logsContainer.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <div>Nenhum log encontrado</div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                logsContainer.innerHTML = '<div class="error">❌ Erro ao carregar logs: ' + error.message + '</div>';
+            }
+        }
+
+        // Exige duas confirmações antes de apagar todos os registros.
+        async function resetLogs() {
+            const confirmMessage = '⚠️ ATENÇÃO: Resetar Todos os Logs\\n\\nEsta ação irá deletar permanentemente todos os fingerprints coletados.\\n\\nDigite "RESET" para confirmar:';
+            const userInput = prompt(confirmMessage);
+
+            if (userInput !== 'RESET') {
+                alert('❌ Reset cancelado. Os logs não foram modificados.');
+                return;
+            }
+
+            const secondConfirm = confirm('Confirmação final: Deletar todos os logs?');
+            if (!secondConfirm) {
+                alert('❌ Reset cancelado. Os logs não foram modificados.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/admin/reset', {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Logs resetados com sucesso!\\n\\nTodos os dados foram apagados.');
+                    loadStats();
+
+                    const logsContainer = document.getElementById('logsContainer');
+                    logsContainer.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <div>Sistema vazio - nenhum log</div>
+                        </div>
+                    `;
+                } else {
+                    throw new Error(data.error || 'Erro desconhecido');
+                }
+            } catch (error) {
+                alert('❌ Erro ao resetar logs: ' + error.message);
+            }
+        }
+
+        async function compareFingerprints() {
+            const fp1Input = document.getElementById('fp1').value.trim();
+            const fp2Input = document.getElementById('fp2').value.trim();
+            const resultDiv = document.getElementById('comparisonResult');
+
+            if (!fp1Input || !fp2Input) {
+                resultDiv.innerHTML = '<div class="error">❌ Por favor, preencha ambos os fingerprints</div>';
+                resultDiv.style.display = 'block';
+                return;
+            }
+
+            let fingerprint1, fingerprint2;
+
+            try {
+                fingerprint1 = JSON.parse(fp1Input);
+                fingerprint2 = JSON.parse(fp2Input);
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">❌ Erro ao parsear JSON: ' + error.message + '</div>';
+                resultDiv.style.display = 'block';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="loading">Comparando fingerprints...</div>';
+            resultDiv.style.display = 'block';
+
+            try {
+                const response = await fetch('/api/compare-fingerprints', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fingerprint1: fingerprint1,
+                        fingerprint2: fingerprint2
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log('Comparison result:', result);
+
+                displayComparisonResult(result);
+
+            } catch (error) {
+                console.error('Comparison error:', error);
+                resultDiv.innerHTML = '<div class="error">❌ Erro ao comparar fingerprints: ' + error.message + '</div>';
+            }
+        }
+
+        function displayComparisonResult(result) {
+            const resultDiv = document.getElementById('comparisonResult');
+
+            const isMatch = result.isMatch === true;
+            const similarity = result.similarityScore || 0;
+            const similarityPercent = (similarity * 100).toFixed(1);
+            const coverage = Number(result.coverage) || 0;
+            const coveragePercent = (coverage * 100).toFixed(1);
+            const confidence = result.confidence || 'none';
+            const details = result.details || {};
+            const thresholds = result.thresholds || {};
+            const minimumCoverage = thresholds.minimumCoverage || '50%';
+
+            let resultColor, resultIcon, resultText, resultBg;
+            if (confidence === 'insufficient') {
+                resultColor = 'var(--warning)';
+                resultIcon = '⚠️';
+                resultText = 'Dados Insuficientes para Comparação';
+                resultBg = '#fef5e7';
+            } else if (isMatch) {
+                resultColor = 'var(--success)';
+                resultIcon = '✅';
+                resultText = 'Mesmo Dispositivo';
+                resultBg = '#e8f5e9';
+            } else if (confidence === 'medium') {
+                resultColor = '#3182ce';
+                resultIcon = '🔵';
+                resultText = 'Provável Mesmo Dispositivo';
+                resultBg = '#e6f2ff';
+            } else if (confidence === 'low') {
+                resultColor = 'var(--warning)';
+                resultIcon = '⚠️';
+                resultText = 'Possível Mesmo Usuário';
+                resultBg = '#fef5e7';
+            } else {
+                resultColor = 'var(--error)';
+                resultIcon = '❌';
+                resultText = 'Dispositivos Diferentes';
+                resultBg = '#ffebee';
+            }
+
+            const html = `
+                <div style="background: ${resultBg}; border: 2px solid ${resultColor}; border-radius: 12px; padding: 24px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                        <div style="font-size: 48px;">${resultIcon}</div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 24px; font-weight: 700; color: ${resultColor}; margin-bottom: 4px;">
+                                ${resultText}
+                            </div>
+                            <div style="font-size: 16px; color: var(--text-secondary);">
+                                Similaridade: <strong style="color: ${resultColor};">${similarityPercent}%</strong>
+                                (Confiança: ${confidence}; cobertura: ${coveragePercent}%)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600;">
+                            Nível de Similaridade
+                        </div>
+                        <div style="background: var(--bg-secondary); height: 32px; border-radius: 16px; overflow: hidden; position: relative;">
+                            <div style="background: linear-gradient(90deg, ${resultColor}, ${resultColor}cc); height: 100%; width: ${similarityPercent}%; transition: width 0.5s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 12px;">
+                                <span style="color: #0f1e3a; font-weight: 700; font-size: 16px; text-shadow: 0 1px 2px rgba(255,255,255,0.3);">${similarityPercent}%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; border-radius: 8px; padding: 12px;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; font-size: 12px;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--success);"></div>
+                                <span>${thresholds.sameDevice || '85%+'} - Mesmo</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background: #3182ce;"></div>
+                                <span>${thresholds.likely || '75-85%'} - Provável</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--warning);"></div>
+                                <span>${thresholds.possible || '65-75%'} - Possível</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--error);"></div>
+                                <span>${escapeHtml(thresholds.different || '<65%')} - Diferente</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--warning);"></div>
+                                <span>Cobertura mínima: ${minimumCoverage}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px;">
+                    <h3 style="margin: 0 0 20px 0; color: var(--text-primary); font-size: 18px; display: flex; align-items: center; gap: 8px;">
+                        <span>📊</span>
+                        <span>Análise Detalhada por Componente</span>
+                    </h3>
+
+                    <div style="display: grid; gap: 16px;">
+                        <div style="background: var(--bg-light); border-radius: 8px; padding: 16px; border-left: 4px solid ${details.canvas ? 'var(--success)' : 'var(--error)'};">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">
+                                        🎨 Canvas Fingerprint
+                                    </div>
+                                    <div style="font-size: 13px; color: var(--text-secondary);">
+                                        Renderização GPU/Driver
+                                    </div>
+                                </div>
+                                <div style="font-size: 24px;">
+                                    ${details.canvas ? '✅' : '❌'}
+                                </div>
+                            </div>
+                            <div style="margin-top: 8px; font-size: 13px; color: ${details.canvas ? 'var(--success)' : 'var(--error)'}; font-weight: 600;">
+                                ${details.canvas ? 'Idêntico' : 'Diferente'}
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-light); border-radius: 8px; padding: 16px; border-left: 4px solid ${details.webgl ? 'var(--success)' : 'var(--error)'};">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">
+                                        🎮 WebGL Fingerprint
+                                    </div>
+                                    <div style="font-size: 13px; color: var(--text-secondary);">
+                                        Hardware gráfico
+                                    </div>
+                                </div>
+                                <div style="font-size: 24px;">
+                                    ${details.webgl ? '✅' : '❌'}
+                                </div>
+                            </div>
+                            <div style="margin-top: 8px; font-size: 13px; color: ${details.webgl ? 'var(--success)' : 'var(--error)'}; font-weight: 600;">
+                                ${details.webgl ? 'Idêntico' : 'Diferente'}
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-light); border-radius: 8px; padding: 16px; border-left: 4px solid ${details.browser >= 0.7 ? 'var(--success)' : 'var(--warning)'};">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">
+                                        🌐 Browser Fingerprint
+                                    </div>
+                                    <div style="font-size: 13px; color: var(--text-secondary);">
+                                        Atributos do navegador
+                                    </div>
+                                </div>
+                                <div style="font-size: 24px;">
+                                    ${details.browser >= 0.7 ? '✅' : '⚠️'}
+                                </div>
+                            </div>
+                            <div style="margin-top: 8px; font-size: 13px; color: ${details.browser >= 0.7 ? 'var(--success)' : 'var(--warning)'}; font-weight: 600;">
+                                Similaridade: ${((details.browser || 0) * 100).toFixed(1)}%
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-light); border-radius: 8px; padding: 16px; border-left: 4px solid ${details.hardware >= 0.7 ? 'var(--success)' : 'var(--warning)'};">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">
+                                        ⚙️ Hardware Profile
+                                    </div>
+                                    <div style="font-size: 13px; color: var(--text-secondary);">
+                                        Características do hardware
+                                    </div>
+                                </div>
+                                <div style="font-size: 24px;">
+                                    ${details.hardware >= 0.7 ? '✅' : '⚠️'}
+                                </div>
+                            </div>
+                            <div style="margin-top: 8px; font-size: 13px; color: ${details.hardware >= 0.7 ? 'var(--success)' : 'var(--warning)'}; font-weight: 600;">
+                                Similaridade: ${((details.hardware || 0) * 100).toFixed(1)}%
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; padding: 16px; background: var(--bg-secondary); border-radius: 8px;">
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                            <strong>💡 Interpretação:</strong>
+                            ${confidence === 'insufficient' ?
+                                `A cobertura dos componentes comparáveis é inferior ao mínimo de ${minimumCoverage}. Mesmo uma similaridade alta não permite confirmar que os fingerprints pertencem ao mesmo dispositivo.` :
+                            isMatch ?
+                                'Os fingerprints são altamente similares, indicando que provavelmente pertencem ao <strong>mesmo dispositivo</strong>. Diferenças mínimas podem ser devido a atualizações de sistema ou mudanças de navegador.' :
+                            confidence === 'medium' ?
+                                'Alta probabilidade de ser o <strong>mesmo dispositivo em navegadores diferentes</strong>. As características de hardware batem, mas alguns atributos do navegador diferem.' :
+                            confidence === 'low' ?
+                                'Pode ser o <strong>mesmo usuário em dispositivos diferentes</strong> ou o mesmo dispositivo com mudanças significativas no sistema.' :
+                                'Os fingerprints são <strong>significativamente diferentes</strong>, indicando dispositivos ou usuários distintos.'
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            resultDiv.innerHTML = html;
+            resultDiv.style.display = 'block';
+
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        async function handleLogout() {
+            if (!confirm('Tem certeza que deseja sair?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/admin/logout', {
+                    method: 'POST',
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok) {
+                    window.location.href = '/admin/login';
+                } else {
+                    alert('❌ Erro ao fazer logout. Tente novamente.');
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('❌ Erro ao fazer logout. Tente novamente.');
+            }
+        }
+
+        loadStats();
+
+        // Mantém os indicadores atualizados enquanto o painel estiver aberto.
+        setInterval(loadStats, 30000);
+    </script>
+</body>
+</html>

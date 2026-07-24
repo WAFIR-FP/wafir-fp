@@ -1,0 +1,42 @@
+services:
+  wasm-db:
+    image: postgres:16-alpine
+    container_name: wasm-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-fingerprint_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+      build: .
+      container_name: wasm-fingerprint
+      env_file:
+        - path: .env
+          required: false
+      depends_on:
+        - wasm-db
+      ports:
+        - "3000:3000"
+      environment:
+        - NODE_ENV=production
+        - DB_ENABLED=true
+        - DB_HOST=wasm-db
+        - DB_PORT=5432
+        - DB_NAME=${POSTGRES_DB:-fingerprint_db}
+        - DB_USER=${POSTGRES_USER:-admin}
+        - DB_PASSWORD=${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD}
+        - DB_SSL=false
+        - DATA_DIR=/app/data
+        - ADMIN_USERNAME=${ADMIN_USERNAME:?Defina ADMIN_USERNAME}
+        - ADMIN_PASSWORD=${ADMIN_PASSWORD:?Defina ADMIN_PASSWORD}
+        - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-http://localhost:3000}
+      volumes:
+        - ./data:/app/data
+
+volumes:
+  postgres_data:
