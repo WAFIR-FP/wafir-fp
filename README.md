@@ -71,7 +71,7 @@ valores ausentes como `Unavailable` e registra `available`,
 `unavailable_fields` e `collection_status`. A normalização decimal de valores
 fracionários, a investigação do pipeline de áudio e a instrumentação de Canvas
 continuam relevantes. Consulte a [síntese completa dos
-resultados](results/open-experiment-2026.md).
+resultados](docs/open-experiment-2026.md).
 
 ## Arquitetura
 
@@ -132,8 +132,8 @@ Para compilação local fora do Docker, o comando `npm run build` usa o `em++` d
 ### Inicialização
 
 ```sh
-git clone https://github.com/wasm-fingerprint/sbseg-wasm-fingerprint.git
-cd sbseg-wasm-fingerprint
+git clone https://github.com/WAFIR-FP/sbseg-wafir-fp.git
+cd sbseg-wafir-fp
 cp .env.example .env
 ```
 
@@ -225,16 +225,17 @@ Com `DATABASE_URL` ou `DB_ENABLED=true`, os registros são gravados no PostgreSQ
 
 ## Organização de pesquisa
 
-O repositório separa quatro responsabilidades:
+O repositório separa três responsabilidades:
 
 | Camada | Conteúdo |
 | --- | --- |
 | `src/` | Implementação da aplicação e dos coletores |
-| `docs/` | Arquitetura, decisões e governança dos dados |
-| `experiments/` | Protocolos, configurações e scripts de reprodução |
-| `results/` | Métricas agregadas, tabelas e figuras |
+| `docs/` | Arquitetura, formato da coleta, governança dos dados e síntese dos resultados |
+| `tests/` | Testes do processamento C++ e da aplicação Node.js |
 
-Essa separação impede que código, procedimentos e resultados sejam apresentados como se fossem o mesmo artefato. O índice da documentação está em [docs/README.md](docs/README.md).
+Essa separação mantém a implementação, a documentação de pesquisa e as
+verificações automatizadas em áreas distintas. O índice da documentação está em
+[docs/README.md](docs/README.md).
 
 ## Privacidade e limitações
 
@@ -245,10 +246,8 @@ O documento [docs/privacy-ethics-limitations.md](docs/privacy-ethics-limitations
 ## Estrutura do repositório
 
 ```text
-sbseg-wasm-fingerprint/
+sbseg-wafir-fp/
 ├── docs/                       # Arquitetura, privacidade e documentação científica
-├── experiments/                # Protocolos e configurações experimentais
-├── results/                    # Resultados agregados e figuras
 ├── src/                        # Código-fonte principal
 │   ├── assets/                 # Imagens, favicon e manifesto
 │   ├── config/                 # Configuração da aplicação
@@ -262,6 +261,8 @@ sbseg-wasm-fingerprint/
 │   ├── services/               # Persistência, sessões e regras de negócio
 │   └── views/                  # Templates e renderização
 ├── app.js                      # Entrada do servidor
+├── .env.example                # Exemplo de configuração local e do Compose
+├── .gitignore                  # Exclusões de credenciais e artefatos locais
 ├── Dockerfile                  # Build WebAssembly e imagem Node.js
 ├── docker-compose.yml          # Aplicação e PostgreSQL
 ├── Makefile                    # Build local do módulo WebAssembly

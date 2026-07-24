@@ -1,9 +1,5 @@
 # Experimento aberto de 2026
 
-Esta página resume, sem dados individuais, a avaliação descrita em
-[`docs/main.tex`](../docs/main.tex). O artigo é a fonte primária para a
-metodologia e a discussão.
-
 ## Escopo
 
 - Período de coleta: 24 de abril a 1º de maio de 2026.
