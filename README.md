@@ -12,8 +12,7 @@ WebGL, 2 de áudio e 1 de Canvas. Cada um também produz hashes SHA-256 por
 componente, um hash final e metadados de disponibilidade e diagnóstico.
 
 **Artigo:** “WAFIR-FP: Uma Ferramenta para Coleta e Análise Comparativa de
-Atributos de Web Fingerprinting em JavaScript e WebAssembly”
-([fonte LaTeX](docs/main.tex)), preparado para o XXVI Simpósio Brasileiro de
+Atributos de Web Fingerprinting com WebAssembly”, preparado para o XXVI Simpósio Brasileiro de
 Segurança da Informação e de Sistemas Computacionais — SBSeg 2026.
 
 ## Conteúdo
@@ -223,12 +222,6 @@ de exclusão e método de análise:
 6. Consulte as estatísticas e os dados JSON no Dashboard.
 
 Com `DATABASE_URL` ou `DB_ENABLED=true`, os registros são gravados no PostgreSQL. Se o banco não estiver configurado ou a operação falhar, a aplicação usa o arquivo JSON em `DATA_DIR`; leituras administrativas unem registros do banco e do fallback pelo ID da coleta.
-
-Os metadados necessários e a convenção para novos protocolos estão em [experiments/README.md](experiments/README.md). Resultados processados devem seguir [results/README.md](results/README.md).
-
-Os tempos exibidos pela interface descrevem execuções individuais e não são um
-resultado de desempenho do artigo. O estudo reportado não avaliou uso de
-memória, latência de inicialização nem desempenho comparativo.
 
 ## Organização de pesquisa
 
