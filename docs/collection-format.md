@@ -1,8 +1,8 @@
-# Formato da coleta, fallbacks e comparação
+# Collection format, fallbacks, and comparison
 
-## Estrutura geral
+## General structure
 
-As implementações JavaScript e C++/WebAssembly produzem a mesma estrutura lógica. Alguns campos internos de cada componente foram omitidos do exemplo:
+The JavaScript and C++/WebAssembly implementations produce the same logical structure. Some internal fields of each component have been omitted from the example:
 
 ```json
 {
@@ -43,24 +43,24 @@ As implementações JavaScript e C++/WebAssembly produzem a mesma estrutura lóg
 }
 ```
 
-`collector` vale `javascript` ou `cpp-wasm`. O campo `collector_version` versiona o comportamento de coleta e de fallback, não a versão do navegador.
+`collector` is either `javascript` or `cpp-wasm`. The `collector_version` field tracks the version of the collection and fallback behavior, not the browser version.
 
-## Campos comparados no artigo
+## Fields compared in the paper
 
-O esquema experimental possui 52 campos destinados à comparação direta entre
-as implementações. Hashes, indicadores de disponibilidade e metadados de
-diagnóstico são adicionais e não entram nessa contagem.
+The experimental schema has 52 fields intended for direct comparison between
+the implementations. Hashes, availability indicators, and diagnostic
+metadata are additional and are not included in this count.
 
-| Categoria | Quantidade | Campos |
+| Category | Count | Fields |
 | --- | ---: | --- |
 | Canvas | 1 | `data_url` |
-| Áudio | 2 | `sample_rate`, `fingerprint_value` |
+| Audio | 2 | `sample_rate`, `fingerprint_value` |
 | WebGL | 11 | `vendor`, `version`, `renderer`, `extensions`, `render_hash`, `max_texture_size`, `vertex_precision`, `fragment_precision`, `max_viewport_width`, `max_viewport_height`, `shading_language_version` |
-| Navegador e DOM | 38 | propriedades de `Navigator`, `Screen` e `Window`, além de suporte a armazenamento e APIs |
+| Browser and DOM | 38 | `Navigator`, `Screen`, and `Window` properties, plus storage and API support |
 | **Total** | **52** | |
 
-Os 38 nomes de navegador e DOM, na ordem lógica compartilhada pelos coletores,
-são: `online`, `vendor`, `product`, `app_name`, `app_code_name`,
+The 38 browser and DOM field names, in the logical order shared by the collectors,
+are: `online`, `vendor`, `product`, `app_name`, `app_code_name`,
 `app_version`, `language`, `languages`, `platform`, `timezone`,
 `timezone_offset`, `user_agent`, `webdriver`, `indexed_db`, `local_storage`,
 `session_storage`, `cookie_enabled`, `java_enabled`, `media_devices`,
@@ -68,87 +68,87 @@ são: `online`, `vendor`, `product`, `app_name`, `app_code_name`,
 `inner_width`, `inner_height`, `outer_width`, `outer_height`, `pixel_ratio`,
 `product_sub`, `screen_width`, `screen_height`, `screen_avail_width`,
 `screen_avail_height`, `screen_resolution`, `screen_color_depth`,
-`screen_pixel_depth`, `max_touch_points` e `hardware_concurrency`.
+`screen_pixel_depth`, `max_touch_points`, and `hardware_concurrency`.
 
-## Estados e fallbacks
+## Statuses and fallbacks
 
-Os estados possíveis são:
+The possible statuses are:
 
-| Estado | Significado |
+| Status | Meaning |
 | --- | --- |
-| `ok` | Componente coletado integralmente |
-| `partial` | Parte dos atributos foi coletada e parte foi descartada |
-| `error` | O componente não pôde ser coletado |
-| `unsupported` | A API necessária não está disponível no ambiente |
+| `ok` | Component fully collected |
+| `partial` | Some attributes were collected and others were discarded |
+| `error` | The component could not be collected |
+| `unsupported` | The required API is not available in the environment |
 
-Os fallbacks são deliberadamente explícitos:
+Fallbacks are deliberately explicit:
 
-| Tipo ou componente | Fallback |
+| Type or component | Fallback |
 | --- | --- |
-| Texto do navegador ou WebGL | `Unavailable` |
-| Número de navegador indisponível | `-1` |
-| Array indisponível | `[]` |
-| Booleano indisponível | `false`, acompanhado pelo nome em `unavailable_fields` |
-| Canvas indisponível | `data_url: "Unavailable"` e `available: false` |
-| WebGL indisponível | textos `Unavailable`, números `0`, arrays vazios e `available: false` |
-| Áudio indisponível | taxa e valor `0`, fingerprint numérico padronizado e `available: false` |
-| Navegador indisponível por completo | `available: false` |
+| Browser or WebGL text | `Unavailable` |
+| Unavailable browser number | `-1` |
+| Unavailable array | `[]` |
+| Unavailable boolean | `false`, with the field name listed in `unavailable_fields` |
+| Unavailable Canvas | `data_url: "Unavailable"` and `available: false` |
+| Unavailable WebGL | `Unavailable` text values, `0` numeric values, empty arrays, and `available: false` |
+| Unavailable audio | Sample rate and value set to `0`, a standardized numeric fingerprint, and `available: false` |
+| Entire browser component unavailable | `available: false` |
 
-Um valor booleano `false` não significa automaticamente falha. Ele somente é descartado quando seu campo também consta em `unavailable_fields` ou quando o componente inteiro tem `available: false`.
+A boolean value of `false` does not automatically indicate failure. It is discarded only when its field is also listed in `unavailable_fields` or when the entire component has `available: false`.
 
-Os códigos de diagnóstico atualmente emitidos incluem:
+The diagnostic codes currently emitted include:
 
-- Canvas: `CANVAS_CONTEXT_UNAVAILABLE` e `CANVAS_SERIALIZATION_FAILED`;
-- WebGL: `WEBGL_CONTEXT_UNAVAILABLE`, `WEBGL_RENDER_FAILED` e `UNEXPECTED_COLLECTION_ERROR`;
-- áudio: `AUDIO_CONTEXT_UNAVAILABLE`, `AUDIO_RENDER_FAILED`, `AUDIO_ASYNCIFY_UNAVAILABLE`, `AUDIO_SAMPLE_COUNT_INVALID` e `AUDIO_RESULT_INVALID`;
-- navegador: `BROWSER_COLLECTION_UNAVAILABLE` e `BROWSER_FIELDS_UNAVAILABLE`.
+- Canvas: `CANVAS_CONTEXT_UNAVAILABLE` and `CANVAS_SERIALIZATION_FAILED`;
+- WebGL: `WEBGL_CONTEXT_UNAVAILABLE`, `WEBGL_RENDER_FAILED`, and `UNEXPECTED_COLLECTION_ERROR`;
+- audio: `AUDIO_CONTEXT_UNAVAILABLE`, `AUDIO_RENDER_FAILED`, `AUDIO_ASYNCIFY_UNAVAILABLE`, `AUDIO_SAMPLE_COUNT_INVALID`, and `AUDIO_RESULT_INVALID`;
+- browser: `BROWSER_COLLECTION_UNAVAILABLE` and `BROWSER_FIELDS_UNAVAILABLE`.
 
-## Áudio
+## Audio
 
-Os dois coletores solicitam um `OfflineAudioContext` com taxa de 44,1 kHz e analisam as 5.000 amostras do buffer renderizado. A taxa efetiva registrada no JSON vem do `AudioBuffer` retornado pelo navegador. Se somente esse metadado não atravessar a ponte Asyncify, é mantida a taxa solicitada de 44,1 kHz. O componente fica disponível quando há exatamente 5.000 amostras e o resultado calculado é finito; a ausência isolada da taxa não descarta um fingerprint de áudio válido.
+Both collectors request an `OfflineAudioContext` with a sample rate of 44.1 kHz and analyze the 5,000 samples in the rendered buffer. The effective sample rate recorded in the JSON comes from the `AudioBuffer` returned by the browser. If only this metadata fails to cross the Asyncify bridge, the requested rate of 44.1 kHz is retained. The component is available when there are exactly 5,000 samples and the calculated result is finite; a missing sample rate alone does not invalidate an otherwise valid audio fingerprint.
 
-## Formação dos hashes
+## Hash construction
 
-O projeto não aplica SHA-256 diretamente sobre o JSON final completo. Em vez disso:
+The project does not apply SHA-256 directly to the complete final JSON. Instead:
 
-1. Canvas usa a representação serializada da imagem.
-2. WebGL usa uma composição em ordem fixa de versão, fabricante, renderizador, extensões, tamanho máximo de textura, viewport, precisão dos shaders de vértice e fragmento, versão da linguagem de shaders e resultado da renderização.
-3. Áudio usa a representação decimal padronizada do valor calculado.
-4. Navegador usa um objeto construído com campos e ordem explicitamente definidos pelos dois coletores; seu hash é exposto em `browser_fingerprint.hash`.
-5. O hash final usa, nesta ordem, os hashes de Canvas, WebGL, áudio e navegador.
+1. Canvas uses the serialized image representation.
+2. WebGL uses a fixed-order composition of version, vendor, renderer, extensions, maximum texture size, viewport, vertex and fragment shader precision, shading language version, and rendering result.
+3. Audio uses the standardized decimal representation of the calculated value.
+4. Browser uses an object constructed with fields and an order explicitly defined by both collectors; its hash is exposed in `browser_fingerprint.hash`.
+5. The final hash uses the Canvas, WebGL, audio, and browser hashes, in that order.
 
-`available`, `unavailable_fields`, `collector`, `collector_version` e `collection_status` não entram no cálculo. Assim, a ordem das propriedades do JSON final não altera o hash. Uma coleta que recorre a fallback pode produzir um hash diferente de uma versão antiga, mas o componente passa a ser identificado como indisponível e não é usado como evidência pelo matcher.
+`available`, `unavailable_fields`, `collector`, `collector_version`, and `collection_status` are not included in the calculation. Thus, the property order in the final JSON does not affect the hash. A collection that uses a fallback may produce a different hash than an older version, but the component is then identified as unavailable and is not used as evidence by the matcher.
 
-### Relação com o experimento de 2026
+### Relationship to the 2026 experiment
 
-Os resultados do artigo registraram divergências históricas causadas por
-`browser.vendor` ausente (`Unknown` em um coletor e valor ausente no outro),
-precisão textual de `devicePixelRatio`, fallback do WebGL, Canvas, áudio e
-dimensões da janela. O contrato `1.2` uniformiza textos indisponíveis como
-`Unavailable` e explicita disponibilidade e erros. Isso melhora a interpretação
-de novas coletas, mas não recalcula retroativamente os 1.050 registros analisados
-no artigo nem elimina, por si só, divergências de precisão numérica ou de
-execução das APIs.
+The paper's results recorded historical differences caused by
+missing `browser.vendor` (`Unknown` in one collector and a missing value in the other),
+the textual precision of `devicePixelRatio`, WebGL fallback behavior, Canvas, audio, and
+window dimensions. Contract `1.2` standardizes unavailable text values as
+`Unavailable` and makes availability and errors explicit. This improves the interpretation
+of new collections but does not retroactively recalculate the 1,050 records analyzed
+in the paper or, by itself, eliminate differences in numerical precision or
+API execution.
 
-## Matcher, cobertura e limiares
+## Matcher, coverage, and thresholds
 
-Os pesos dos componentes são:
+The component weights are:
 
-| Componente | Peso máximo |
+| Component | Maximum weight |
 | --- | ---: |
-| Canvas | 0,25 |
-| WebGL | 0,20 |
-| Áudio | 0,10 |
-| Navegador | 0,45 |
+| Canvas | 0.25 |
+| WebGL | 0.20 |
+| Audio | 0.10 |
+| Browser | 0.45 |
 
-Componentes com `available: false` e campos presentes em `unavailable_fields` são excluídos. A similaridade é normalizada apenas pelo peso que pôde ser comparado; `coverage` informa a soma dos pesos realmente disponíveis. Uma decisão de mesma máquina exige cobertura mínima de `0,50`.
+Components with `available: false` and fields listed in `unavailable_fields` are excluded. Similarity is normalized only by the weight that could be compared; `coverage` reports the sum of the weights actually available. A same-machine decision requires minimum coverage of `0.50`.
 
-| Classificação | Similaridade |
+| Classification | Similarity |
 | --- | ---: |
-| Exata | 95% ou mais |
-| Alta / mesma máquina | 85% ou mais |
-| Média / provavelmente a mesma | 75% ou mais |
-| Baixa / possivelmente a mesma | 65% ou mais |
-| Diferente | Abaixo de 65% |
+| Exact | 95% or higher |
+| High / same machine | 85% or higher |
+| Medium / probably the same | 75% or higher |
+| Low / possibly the same | 65% or higher |
+| Different | Below 65% |
 
-A resposta de comparação inclui os componentes excluídos e os estados de coleta de cada fingerprint. Os pesos e limiares são heurísticos e devem ser validados para a população e o protocolo experimental utilizados.
+The comparison response includes the excluded components and collection statuses for each fingerprint. The weights and thresholds are heuristic and should be validated for the population and experimental protocol used.

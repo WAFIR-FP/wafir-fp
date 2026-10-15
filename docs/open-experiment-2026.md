@@ -1,79 +1,79 @@
-# Experimento aberto de 2026
+# 2026 open experiment
 
-## Escopo
+## Scope
 
-- Período de coleta: 24 de abril a 1º de maio de 2026.
-- Desenho: convite aberto por e-mail e redes sociais.
-- Unidade observada: sessão de navegação que executa, sequencialmente, o coletor
-  C++/WebAssembly e depois o coletor JavaScript.
-- Campos comparados por sessão: 52 — 38 de navegador e DOM, 11 de WebGL, 2 de
-  áudio e 1 de Canvas.
-- Critério de exclusão relatado: mais da metade dos atributos ausentes.
+- Collection period: April 24 to May 1, 2026.
+- Design: open invitation via email and social media.
+- Observation unit: a browsing session that sequentially runs the
+  C++/WebAssembly collector, followed by the JavaScript collector.
+- Fields compared per session: 52 — 38 for the browser and DOM, 11 for WebGL, 2 for
+  audio, and 1 for Canvas.
+- Reported exclusion criterion: more than half of the attributes missing.
 
-O estudo avaliou reprodutibilidade entre implementações. Não avaliou
-desempenho, uso de memória, latência de inicialização, estabilidade longitudinal
-ou discrição frente a ferramentas anti-fingerprinting.
+The study evaluated reproducibility between implementations. It did not evaluate
+performance, memory usage, startup latency, longitudinal stability,
+or stealth against anti-fingerprinting tools.
 
-## Amostra
+## Sample
 
-| Estado | Sessões |
+| Status | Sessions |
 | --- | ---: |
-| Coletas recebidas | 1.054 |
-| Excluídas por informação incompleta | 4 |
-| Válidas para comparação | 1.050 |
+| Collections received | 1,054 |
+| Excluded due to incomplete information | 4 |
+| Valid for comparison | 1,050 |
 
-Caracterização das 1.054 coletas recebidas:
+Characteristics of the 1,054 collections received:
 
-| Dimensão | Distribuição |
+| Dimension | Distribution |
 | --- | --- |
-| Dispositivo | 651 smartphones (61,8%); 396 desktops/notebooks (37,6%); 7 tablets (0,7%) |
-| Sistema operacional | 503 Android (47,7%); 294 Windows (27,9%); 143 iOS (13,6%); 82 Linux (7,8%); 32 macOS (3,0%) |
-| Navegador | 624 Chrome (59,2%); 139 Firefox (13,2%); 124 Safari (11,8%); 89 Samsung Internet (8,4%); 63 Edge (6,0%); 15 Opera (1,4%) |
+| Device | 651 smartphones (61.8%); 396 desktops/laptops (37.6%); 7 tablets (0.7%) |
+| Operating system | 503 Android (47.7%); 294 Windows (27.9%); 143 iOS (13.6%); 82 Linux (7.8%); 32 macOS (3.0%) |
+| Browser | 624 Chrome (59.2%); 139 Firefox (13.2%); 124 Safari (11.8%); 89 Samsung Internet (8.4%); 63 Edge (6.0%); 15 Opera (1.4%) |
 
-## Equivalência observada
+## Observed equivalence
 
-| Nível de comparação | Iguais | Divergentes |
+| Comparison level | Matching | Differing |
 | --- | ---: | ---: |
-| Hash final por sessão | 802 de 1.050 (76,38%) | 248 de 1.050 (23,62%) |
-| Atributo individual | 54.316 de 54.600 (99,48%) | 284 de 54.600 (0,52%) |
+| Final hash per session | 802 of 1,050 (76.38%) | 248 of 1,050 (23.62%) |
+| Individual attribute | 54,316 of 54,600 (99.48%) | 284 of 54,600 (0.52%) |
 
-Os dois percentuais não são contraditórios. O hash final é formado a partir dos
-hashes dos quatro componentes; uma única diferença entre os 52 atributos pode
-alterá-lo completamente.
+The two percentages are not contradictory. The final hash is constructed from the
+hashes of the four components; a single difference among the 52 attributes can
+change it completely.
 
-## Categorias de divergência
+## Categories of differences
 
-| Categoria | Sessões | % das 248 divergentes | % das 1.050 válidas |
+| Category | Sessions | % of the 248 sessions with differences | % of the 1,050 valid sessions |
 | --- | ---: | ---: | ---: |
-| `browser.vendor` ausente | 136 | 54,84% | 12,95% |
-| `devicePixelRatio` / `pixel_ratio` | 71 | 28,63% | 6,76% |
-| Canvas | 26 | 10,48% | 2,48% |
-| Dimensões da janela | 17 | 6,85% | 1,62% |
-| Áudio | 16 | 6,45% | 1,52% |
-| WebGL | 1 | 0,40% | 0,10% |
+| Missing `browser.vendor` | 136 | 54.84% | 12.95% |
+| `devicePixelRatio` / `pixel_ratio` | 71 | 28.63% | 6.76% |
+| Canvas | 26 | 10.48% | 2.48% |
+| Window dimensions | 17 | 6.85% | 1.62% |
+| Audio | 16 | 6.45% | 1.52% |
+| WebGL | 1 | 0.40% | 0.10% |
 
-As categorias não são mutuamente exclusivas. Entre as 248 sessões com hash
-final divergente, 230 diferiram em uma categoria, 17 em duas e uma em três.
+The categories are not mutually exclusive. Among the 248 sessions with differing
+final hashes, 230 differed in one category, 17 in two, and one in three.
 
-- Em 136 sessões, ausência de `browser.vendor` foi representada de maneiras
-  diferentes (`Unknown` no coletor C++/Wasm e valor ausente no JavaScript).
-- Em 71, `devicePixelRatio` representou a mesma grandeza com quantidades
-  diferentes de casas decimais.
-- As 26 diferenças de Canvas produziram `data_url` e hash distintos, mas os
-  dados registrados não permitem isolar rasterização, fonte, ordem de desenho
-  ou serialização.
-- As 17 diferenças de dimensão podem refletir mudança do estado visual entre as
-  duas execuções sequenciais; o experimento não registrou eventos suficientes
-  para estabelecer causalidade.
-- As 16 diferenças de áudio se concentraram no valor processado, mas a entrada
-  textual de doze casas usada pelo hash não foi persistida.
-- A única ocorrência de WebGL usou fallbacks no coletor C++/Wasm e dados
-  completos no JavaScript; ela também divergiu em Canvas e áudio.
+- In 136 sessions, a missing `browser.vendor` was represented in
+  different ways (`Unknown` in the C++/Wasm collector and a missing value in JavaScript).
+- In 71, `devicePixelRatio` represented the same quantity with different
+  numbers of decimal places.
+- The 26 Canvas differences produced distinct `data_url` values and hashes, but the
+  recorded data do not allow rasterization, font, drawing order,
+  or serialization to be isolated as the cause.
+- The 17 dimension differences may reflect a change in visual state between the
+  two sequential runs; the experiment did not record enough events
+  to establish causality.
+- The 16 audio differences were concentrated in the processed value, but the
+  text input with twelve decimal places used by the hash was not persisted.
+- The single WebGL occurrence used fallbacks in the C++/Wasm collector and complete
+  data in JavaScript; it also differed in Canvas and audio.
 
-## Interpretação e rastreabilidade
+## Interpretation and traceability
 
-Os resultados sustentam a viabilidade do C++/WebAssembly para reproduzir a
-maior parte dos atributos, mas também mostram que igualdade de hash não deve ser
-usada isoladamente como evidência de equivalência semântica. Valores ausentes,
-precisão decimal, estado dinâmico do navegador e políticas de fallback precisam
-ser normalizados e diagnosticados antes da geração do identificador.
+The results support the feasibility of C++/WebAssembly for reproducing
+most attributes, but also show that hash equality should not be
+used alone as evidence of semantic equivalence. Missing values,
+decimal precision, dynamic browser state, and fallback policies must
+be normalized and diagnosed before identifier generation.

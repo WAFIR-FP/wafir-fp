@@ -1,42 +1,42 @@
-# Componentes Principais
+# Main Components
 
 ## Controllers
 
-Recebem as requisições das rotas, coordenam os serviços necessários e retornam respostas para o cliente. Cada controlador concentra uma área da aplicação: páginas, administração, coleta de fingerprint e health check.
+Receive requests from routes, coordinate the required services, and return responses to the client. Each controller focuses on one area of the application: pages, administration, fingerprint collection, and health checks.
 
 ## Services
 
-Reúnem a lógica de negócio e as operações de dados. São responsáveis por processar fingerprints, salvar logs, consultar estatísticas e gerenciar sessões administrativas.
+Contain business logic and data operations. They handle fingerprint processing, log storage, statistics queries, and admin session management.
 
 ## Middleware
 
-Executam verificações antes das requisições chegarem aos controladores. A aplicação utiliza middlewares para autenticação administrativa, cabeçalhos de segurança e limitação de requisições.
+Perform checks before requests reach the controllers. The application uses middleware for admin authentication, security headers, and request rate limiting.
 
 ## Routes
 
-Definem os endpoints da aplicação e conectam cada rota ao controlador correspondente. O arquivo `routes/index.js` centraliza o agrupamento das rotas.
+Define the application endpoints and connect each route to its corresponding controller. The `routes/index.js` file centralizes route grouping.
 
 ## Fingerprint
 
-Contém os módulos responsáveis pela coleta de características do navegador e do
-dispositivo. A aplicação possui uma implementação de referência em JavaScript e
-outra em C++ compilado para WebAssembly com Emscripten.
+Contains the modules responsible for collecting browser and device
+characteristics. The application has a reference implementation in JavaScript and
+another in C++ compiled to WebAssembly with Emscripten.
 
-O coletor C++/Wasm é híbrido: pontes `EM_JS` acessam Canvas, WebGL, Web Audio e
-objetos do navegador; o módulo C++ coordena o processamento, a normalização, os
-hashes e a saída. Os coletores produzem 52 campos comparáveis (38 de navegador
-e DOM, 11 de WebGL, 2 de áudio e 1 de Canvas), além de hashes e diagnósticos.
+The C++/Wasm collector is hybrid: `EM_JS` bridges access Canvas, WebGL, Web Audio, and
+browser objects; the C++ module coordinates processing, normalization,
+hashing, and output. The collectors produce 52 comparable fields (38 for the browser
+and DOM, 11 for WebGL, 2 for audio, and 1 for Canvas), along with hashes and diagnostics.
 
-O formato compartilhado, os fallbacks e a formação dos hashes estão descritos em [`docs/collection-format.md`](../docs/collection-format.md).
+The shared format, fallbacks, and hash construction are described in [`docs/collection-format.md`](../docs/collection-format.md).
 
 ## Views
 
-Armazena os templates HTML renderizados no servidor. O arquivo `view.engine.js` implementa um mecanismo simples de substituição de variáveis nos templates.
+Stores the HTML templates rendered on the server. The `view.engine.js` file implements a simple variable substitution mechanism for the templates.
 
 ## Assets
 
-Contém imagens, favicon e manifesto da aplicação.
+Contains the application's images, favicon, and manifest.
 
-## Documentação de pesquisa
+## Research documentation
 
-A arquitetura e as considerações de privacidade ficam separadas do código em [`docs/`](../docs/README.md).
+Architecture and privacy considerations are documented separately from the code in [`docs/`](../docs/README.md).

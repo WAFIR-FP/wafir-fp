@@ -1,10 +1,10 @@
-# Documentação de pesquisa
+# Research documentation
 
-Esta pasta reúne a documentação conceitual e científica da ferramenta.
+This folder contains the tool's conceptual and scientific documentation.
 
-## Documentos
+## Documents
 
-- [Arquitetura](architecture.md): componentes, fluxo de coleta e persistência.
-- [Formato da coleta, fallbacks e comparação](collection-format.md): estrutura do JSON, códigos de erro, formação dos hashes e matcher.
-- [Privacidade, ética e limitações](privacy-ethics-limitations.md): riscos, salvaguardas e limites de interpretação.
-- [Síntese do experimento aberto](open-experiment-2026.md): números e interpretação dos resultados reportados no artigo.
+- [Architecture](architecture.md): components, collection flow, and persistence.
+- [Collection format, fallbacks, and comparison](collection-format.md): JSON structure, error codes, hash construction, and matcher.
+- [Privacy, ethics, and limitations](privacy-ethics-limitations.md): risks, safeguards, and limits of interpretation.
+- [Open experiment summary](open-experiment-2026.md): figures and interpretation of the results reported in the paper.

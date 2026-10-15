@@ -1,39 +1,39 @@
-# Privacidade, ética e limitações
+# Privacy, ethics, and limitations
 
-## Escopo
+## Scope
 
-Esta ferramenta foi criada para pesquisa sobre web fingerprinting e comparação entre implementações JavaScript e WebAssembly. Ela não deve ser usada para rastreamento oculto, tomada de decisão automatizada sobre pessoas ou identificação individual sem base ética e autorização adequadas.
+This tool was created for research on web fingerprinting and comparison between JavaScript and WebAssembly implementations. It should not be used for covert tracking, automated decision-making about people, or individual identification without an appropriate ethical basis and authorization.
 
-## Dados observados
+## Observed data
 
-A coleta pode incluir:
+Collection may include:
 
-- representação de Canvas e características de renderização;
-- fabricante, renderizador, extensões e capacidades WebGL;
-- resultado de uma renderização de áudio offline;
-- user agent, idioma, plataforma, fuso horário e dimensões de tela;
-- suporte a armazenamento, cookies, mídia e APIs do navegador;
-- hashes compostos e identificadores derivados desses sinais;
-- horários de coleta e identificadores de sessão.
+- Canvas representation and rendering characteristics;
+- WebGL vendor, renderer, extensions, and capabilities;
+- the result of offline audio rendering;
+- user agent, language, platform, time zone, and screen dimensions;
+- support for storage, cookies, media, and browser APIs;
+- composite hashes and identifiers derived from these signals;
+- collection timestamps and session identifiers.
 
-Mesmo quando armazenados como hash, esses valores podem permitir correlação entre sessões. Hash não equivale a anonimização.
+Even when stored as hashes, these values may allow correlation across sessions. Hashing does not equate to anonymization.
 
-## Limitações técnicas e científicas
+## Technical and scientific limitations
 
-- Um fingerprint representa um ambiente observado, não a identidade de uma pessoa.
-- Atualizações de navegador, sistema, driver ou hardware podem alterar os sinais.
-- Ambientes diferentes podem produzir valores semelhantes, gerando falsos positivos.
-- O mesmo dispositivo pode produzir valores diferentes, gerando falsos negativos.
-- Proteções do navegador, extensões, virtualização e configurações de privacidade afetam a coleta.
-- Os pesos e limiares do matcher são heurísticos e precisam ser validados para cada população estudada.
-- Um identificador de sessão derivado do hash é estável, mas aumenta o risco de vinculação entre coletas.
-- Comparações de desempenho dependem de aquecimento, carga do sistema, navegador e ordem de execução.
-- Resultados obtidos em um conjunto limitado de navegadores ou dispositivos não devem ser generalizados sem validação adicional.
-- Componentes indisponíveis reduzem a cobertura da comparação; uma similaridade alta com cobertura baixa não comprova equivalência entre ambientes.
-- Os códigos em `collection_status` ajudam a diagnosticar falhas técnicas, mas não permitem concluir por que uma API foi bloqueada ou alterada pelo navegador.
-- Uma diferença em apenas um atributo altera o SHA-256 final; hashes divergentes
-  não significam necessariamente ambientes materialmente diferentes.
-- A execução sequencial pode observar estados diferentes de propriedades
-  dinâmicas, como dimensões e orientação da janela.
-- A implementação C++/Wasm depende de uma ponte JavaScript para acessar APIs
-  Web; conversões nessa fronteira também podem introduzir divergências.
+- A fingerprint represents an observed environment, not a person's identity.
+- Browser, system, driver, or hardware updates can alter the signals.
+- Different environments can produce similar values, leading to false positives.
+- The same device can produce different values, leading to false negatives.
+- Browser protections, extensions, virtualization, and privacy settings affect collection.
+- Matcher weights and thresholds are heuristic and must be validated for each population studied.
+- A session identifier derived from the hash is stable but increases the risk of linking collections.
+- Performance comparisons depend on warm-up, system load, browser, and execution order.
+- Results obtained from a limited set of browsers or devices should not be generalized without further validation.
+- Unavailable components reduce comparison coverage; high similarity with low coverage does not establish equivalence between environments.
+- The codes in `collection_status` help diagnose technical failures but do not establish why an API was blocked or modified by the browser.
+- A difference in just one attribute changes the final SHA-256 hash; differing hashes
+  do not necessarily mean materially different environments.
+- Sequential execution may observe different states of dynamic
+  properties, such as window dimensions and orientation.
+- The C++/Wasm implementation depends on a JavaScript bridge to access Web
+  APIs; conversions at this boundary can also introduce differences.

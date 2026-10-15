@@ -1,77 +1,77 @@
-# Arquitetura
+# Architecture
 
-## Visão geral
+## Overview
 
 ```mermaid
 flowchart LR
-    U[Participante no navegador] --> UI[Interface de coleta]
-    UI --> WASM[Coletor C++ / WebAssembly]
-    UI --> JS[Coletor JavaScript]
-    WASM --> COL[Resultados e hashes compostos]
+    U[Participant in the browser] --> UI[Collection interface]
+    UI --> WASM[C++ / WebAssembly collector]
+    UI --> JS[JavaScript collector]
+    WASM --> COL[Results and composite hashes]
     JS --> COL
-    COL --> API[API Express]
-    API --> MATCH[Matcher e estatísticas]
-    API --> STORE{Persistência disponível}
-    STORE -->|PostgreSQL ativo| DB[(PostgreSQL)]
-    STORE -->|Banco indisponível| FILE[(Arquivo JSON)]
-    MATCH --> ADMIN[Painel administrativo]
+    COL --> API[Express API]
+    API --> MATCH[Matcher and statistics]
+    API --> STORE{Available persistence}
+    STORE -->|PostgreSQL active| DB[(PostgreSQL)]
+    STORE -->|Database unavailable| FILE[(JSON file)]
+    MATCH --> ADMIN[Admin dashboard]
     DB --> ADMIN
     FILE --> ADMIN
 ```
 
-## Componentes
+## Components
 
-| Componente | Responsabilidade | Localização |
+| Component | Responsibility | Location |
 | --- | --- | --- |
-| Interface de coleta | Inicializa os módulos, apresenta os resultados e envia a coleta | `src/views/templates/coleta-fingerprint.html` |
-| Coletor WebAssembly | Obtém sinais de Canvas, WebGL, áudio e navegador por C++ compilado com Emscripten | `src/fingerprint/cpp/` |
-| Coletor JavaScript | Produz uma implementação de referência para a comparação experimental | `src/fingerprint/js/` |
-| API | Valida requisições e coordena os serviços | `src/controllers/` e `src/routes/` |
-| Matcher | Calcula similaridade e agrupa fingerprints segundo os limiares configurados | `src/fingerprint-matcher/` |
-| Persistência | Usa PostgreSQL quando disponível e arquivo JSON como fallback | `src/services/log.service.js` |
-| Administração | Consulta registros, estatísticas e comparações | `src/controllers/admin.controller.js` e `src/views/templates/admin.html` |
+| Collection interface | Initializes the modules, displays the results, and submits the collection | `src/views/templates/coleta-fingerprint.html` |
+| WebAssembly collector | Obtains Canvas, WebGL, audio, and browser signals through C++ compiled with Emscripten | `src/fingerprint/cpp/` |
+| JavaScript collector | Provides a reference implementation for experimental comparison | `src/fingerprint/js/` |
+| API | Validates requests and coordinates services | `src/controllers/` and `src/routes/` |
+| Matcher | Calculates similarity and groups fingerprints according to the configured thresholds | `src/fingerprint-matcher/` |
+| Persistence | Uses PostgreSQL when available and a JSON file as a fallback | `src/services/log.service.js` |
+| Administration | Queries records, statistics, and comparisons | `src/controllers/admin.controller.js` and `src/views/templates/admin.html` |
 
-## Fluxo de coleta
+## Collection flow
 
-1. A página carrega uma única instância do runtime C++/WebAssembly.
-2. A coleta WebAssembly é executada e cronometrada.
-3. A coleta JavaScript é executada em seguida, sem concorrência com a primeira.
-4. Cada implementação produz hashes dos componentes, um hash composto e diagnósticos de disponibilidade.
-5. A interface apresenta os dados e envia o resultado à API.
-6. A API sanitiza o payload, calcula o identificador e persiste o registro.
+1. The page loads a single instance of the C++/WebAssembly runtime.
+2. The WebAssembly collection runs and is timed.
+3. The JavaScript collection runs next, without running concurrently with the first.
+4. Each implementation produces component hashes, a composite hash, and availability diagnostics.
+5. The interface displays the data and sends the result to the API.
+6. The API sanitizes the payload, calculates the identifier, and persists the record.
 
-A execução sequencial evita concorrência direta entre os coletores, mas também
-introduz um intervalo entre as observações. Propriedades dinâmicas, como
-dimensões da janela, orientação e barras do navegador, podem mudar nesse
-intervalo. Os tempos mostrados pela interface são observações exploratórias de
-uma execução; o artigo não os avaliou como benchmark de desempenho.
+Sequential execution prevents direct concurrency between the collectors, but also
+introduces an interval between observations. Dynamic properties, such as
+window dimensions, orientation, and browser bars, can change during this
+interval. The timings displayed by the interface are exploratory observations from
+a single run; the paper did not evaluate them as a performance benchmark.
 
-O coletor WebAssembly usa bindings JavaScript para acessar APIs exclusivas do
-navegador, pois Wasm não possui acesso direto a Canvas, WebGL, Web Audio,
-`Navigator`, `Screen` ou `Window`. Na coleta de áudio, o binding renderiza o
-sinal com `OfflineAudioContext` e copia 5.000 amostras para a memória linear; a
-agregação, a conversão para `Float32`, a normalização e a entrada do hash são
-processadas em C++/Wasm. Canvas e WebGL também são renderizados nas pontes
-`EM_JS`. Assim, a implementação deve ser entendida como híbrida
-C++/Wasm–JavaScript, e a fronteira de interoperabilidade faz parte do objeto de
-estudo.
+The WebAssembly collector uses JavaScript bindings to access browser-only
+APIs, since Wasm has no direct access to Canvas, WebGL, Web Audio,
+`Navigator`, `Screen`, or `Window`. For audio collection, the binding renders the
+signal with `OfflineAudioContext` and copies 5,000 samples to linear memory;
+aggregation, conversion to `Float32`, normalization, and hash input preparation are
+handled in C++/Wasm. Canvas and WebGL rendering also occurs in the
+`EM_JS` bridges. Thus, the implementation should be understood as a hybrid
+C++/Wasm–JavaScript implementation, and the interoperability boundary is part of the subject
+under study.
 
-No coletor JavaScript, Canvas, WebGL, navegador e áudio são isolados com `Promise.allSettled`. Portanto, a indisponibilidade de uma API não elimina os resultados dos demais componentes. O coletor C++/WebAssembly aplica fallbacks equivalentes nas pontes `EM_JS` e informa erros de contexto, renderização ou validação no objeto `collection_status`.
+In the JavaScript collector, Canvas, WebGL, browser, and audio collection are isolated using `Promise.allSettled`. Therefore, an unavailable API does not eliminate the results of the other components. The C++/WebAssembly collector applies equivalent fallbacks in the `EM_JS` bridges and reports context, rendering, or validation errors in the `collection_status` object.
 
-## Integridade dos hashes e diagnóstico
+## Hash integrity and diagnostics
 
-O hash final não é calculado sobre a serialização do JSON completo. Cada implementação constrói explicitamente as entradas dos hashes em uma ordem fixa, evitando dependência da ordem de propriedades dos objetos recebidos. Metadados como `available`, `unavailable_fields` e `collection_status` permanecem fora do material do hash.
+The final hash is not calculated from the serialization of the complete JSON. Each implementation explicitly constructs the hash inputs in a fixed order, avoiding dependence on the property order of the received objects. Metadata such as `available`, `unavailable_fields`, and `collection_status` remain outside the hash input.
 
-O matcher ignora componentes marcados com `available: false` e atributos listados em `unavailable_fields`. A pontuação é normalizada pelo peso disponível e a decisão oficial exige cobertura mínima. A API de comparação devolve a cobertura e os componentes excluídos para que uma igualdade de fallback não seja interpretada como evidência de mesma máquina.
+The matcher ignores components marked with `available: false` and attributes listed in `unavailable_fields`. The score is normalized by the available weight, and the final decision requires minimum coverage. The comparison API returns coverage and excluded components so that matching fallback values are not interpreted as evidence of the same machine.
 
-O contrato completo está em [collection-format.md](collection-format.md).
+The full contract is available in [collection-format.md](collection-format.md).
 
-## Persistência
+## Persistence
 
-PostgreSQL é o destino primário quando `DB_ENABLED=true` ou `DATABASE_URL` está definida. Se o banco não estiver configurado ou a gravação falhar, o serviço usa o arquivo JSON configurado em `DATA_DIR`. Os destinos não são espelhos automáticos, mas as leituras administrativas unem os registros pelo ID de cada coleta para não ocultar dados gravados durante uma indisponibilidade temporária do banco.
+PostgreSQL is the primary destination when `DB_ENABLED=true` or `DATABASE_URL` is set. If the database is not configured or the write fails, the service uses the JSON file configured in `DATA_DIR`. The destinations are not automatic mirrors, but admin reads merge records by collection ID to avoid hiding data written during temporary database unavailability.
 
-## Fronteiras de confiança
+## Trust boundaries
 
-- O navegador é uma fonte de dados não confiável; o servidor valida o formato do payload.
-- O painel administrativo usa uma sessão `HttpOnly`, `Secure` em produção e `SameSite=Strict`; credenciais explícitas são obrigatórias em produção.
-- Fingerprints e hashes persistentes podem permitir correlação entre sessões e devem ser tratados como dados potencialmente identificáveis.
+- The browser is an untrusted data source; the server validates the payload format.
+- The admin dashboard uses an `HttpOnly` session with `Secure` in production and `SameSite=Strict`; explicit credentials are required in production.
+- Persistent fingerprints and hashes may allow correlation across sessions and should be treated as potentially identifiable data.
